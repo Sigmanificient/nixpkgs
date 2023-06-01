@@ -41,8 +41,7 @@ def generate_grammar(item):
     generated += subprocess.check_output(["nurl", url, rev, "--indent=4"], text=True)
     generated += ";"
 
-    location = info.get("location")
-    if location:
+    if location := info.get("location"):
         generated += f"""
     location = "{location}";"""
 

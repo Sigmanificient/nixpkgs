@@ -12,13 +12,13 @@ Note the `NIX_PYTHONPATH` environment variable is unset in order to prevent leak
 Similarly, this module listens to the environment variable `NIX_PYTHONEXECUTABLE`
 and sets `sys.executable` to its value.
 """
+
 import site
 import sys
 import os
 import functools
 
-paths = os.environ.pop('NIX_PYTHONPATH', None)
-if paths:
+if paths := os.environ.pop('NIX_PYTHONPATH', None):
     functools.reduce(lambda k, p: site.addsitedir(p, k), paths.split(':'), site._init_pathinfo())
 
 # Check whether we are in a venv or virtualenv. 

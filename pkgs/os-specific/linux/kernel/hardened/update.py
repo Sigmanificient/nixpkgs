@@ -122,7 +122,7 @@ def fetch_patch(*, name: str, release_info: ReleaseInfo) -> Optional[Patch]:
     patch_filename = f"{name}.patch"
     try:
         patch_url = find_asset(patch_filename)
-        sig_url = find_asset(patch_filename + ".sig")
+        sig_url = find_asset(f"{patch_filename}.sig")
     except KeyError:
         print(f"error: {patch_filename}{{,.sig}} not present", file=sys.stderr)
         return None
@@ -194,8 +194,7 @@ with open(HARDENED_PATCHES_PATH) as patches_file:
 # Get the set of currently packaged kernel versions.
 kernel_versions = {}
 for filename in os.listdir(NIXPKGS_KERNEL_PATH):
-    filename_match = re.fullmatch(r"linux-(\d+)\.(\d+)\.nix", filename)
-    if filename_match:
+    if filename_match := re.fullmatch(r"linux-(\d+)\.(\d+)\.nix", filename):
         nix_version_expr = f"""
             with import {NIXPKGS_PATH} {{}};
             (callPackage {NIXPKGS_KERNEL_PATH / filename} {{}}).version
@@ -249,15 +248,12 @@ for release in repo.get_releases():
 
     if kernel_version == packaged_kernel_version:
         releases[kernel_key] = release_info
-    else:
-        # Fall back to the latest patch for this major kernel version,
-        # skipping patches for kernels newer than the packaged one.
-        if '.'.join(str(x) for x in kernel_version) > '.'.join(str(x) for x in packaged_kernel_version):
-            continue
-        elif (
-            kernel_key not in releases or releases[kernel_key].version < version
-        ):
-            releases[kernel_key] = release_info
+    elif '.'.join(str(x) for x in kernel_version) > '.'.join(str(x) for x in packaged_kernel_version):
+        continue
+    elif (
+        kernel_key not in releases or releases[kernel_key].version < version
+    ):
+        releases[kernel_key] = release_info
 
 # Update hardened-patches.json for each release.
 for kernel_key in sorted(releases.keys()):
@@ -292,11 +288,9 @@ for kernel_key in sorted(releases.keys()):
                 message = f"init at {version_str}"
             commit_patches(kernel_key=kernel_key, message=message)
 
-missing_kernel_versions = kernel_versions.keys() - patches.keys()
-
-if missing_kernel_versions:
+if missing_kernel_versions := kernel_versions.keys() - patches.keys():
     print(
-        f"warning: no patches for kernel versions "
+        "warning: no patches for kernel versions "
         + ", ".join(missing_kernel_versions),
         file=sys.stderr,
     )

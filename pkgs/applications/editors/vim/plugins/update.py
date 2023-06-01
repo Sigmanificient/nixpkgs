@@ -133,8 +133,7 @@ def main():
     global luaPlugins
     luaPlugins = run_nix_expr(GET_PLUGINS_LUA)
 
-    with open(f"{ROOT}/get-plugins.nix") as f:
-        GET_PLUGINS = f.read()
+    GET_PLUGINS = Path(f"{ROOT}/get-plugins.nix").read_text()
     editor = VimEditor("vim", ROOT, GET_PLUGINS)
     editor.run()
 

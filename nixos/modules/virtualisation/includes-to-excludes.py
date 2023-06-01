@@ -60,26 +60,18 @@ def strings_to_inverted_regex(strings):
         if item != "":
             chars[item[0]].append(item[1:])
 
-    if len(chars) == 0:
-        s += match_end
-    else:
-        s += chars_to_inverted_class(chars)
-
+    s += match_end if not chars else chars_to_inverted_class(chars)
     # Now match anything that starts with the right char, but then goes wrong
 
     for char, sub in chars.items():
-        s += "|(" + re.escape(char) + strings_to_inverted_regex(sub) + ")"
+        s += f"|({re.escape(char)}{strings_to_inverted_regex(sub)})"
 
     s += ")"
     return s
 
 if __name__ == "__main__":
-    stdin_lines = []
-    for line in sys.stdin:
-        if line.strip() != "":
-            stdin_lines.append(line.strip())
-
-    print("^" + strings_to_inverted_regex(stdin_lines))
+    stdin_lines = [line.strip() for line in sys.stdin if line.strip() != ""]
+    print(f"^{strings_to_inverted_regex(stdin_lines)}")
 
 # Test:
 # (echo foo; echo fo/; echo foo/; echo foo/ba/r; echo b; echo az; echo az/; echo az/a; echo ab; echo ab/a; echo ab/; echo abc; echo abcde; echo abb; echo ac; echo b) | grep -vE "$((echo ab; echo az; echo foo;) | python includes-to-excludes.py | tee /dev/stderr )"

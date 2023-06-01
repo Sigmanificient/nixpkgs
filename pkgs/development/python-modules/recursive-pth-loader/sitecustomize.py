@@ -7,6 +7,7 @@
   they will be processed in next iteration
 """
 
+
 import os
 import site
 import sys
@@ -22,7 +23,7 @@ for path_idx, sitedir in enumerate(sys.path):
         names = os.listdir(sitedir)
     except os.error:
         continue
-    dotpth = os.extsep + "pth"
+    dotpth = f"{os.extsep}pth"
     pths = [name for name in names if name.endswith(dotpth)]
 
     for pth in pths:
@@ -42,5 +43,5 @@ for path_idx, sitedir in enumerate(sys.path):
 
                 line = line.rstrip()
                 dir, dircase = site.makepath(sitedir, line)
-                if not dircase in sys.path:
+                if dircase not in sys.path:
                     sys.path.insert(path_idx+1, dir)

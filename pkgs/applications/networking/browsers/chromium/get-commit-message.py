@@ -20,28 +20,30 @@ target_version = sys.argv[1] if len(sys.argv) == 2 else None
 for entry in feed.entries:
     url = requests.get(entry.link).url.split('?')[0]
     if entry.title != 'Stable Channel Update for Desktop':
-        if target_version and entry.title == '':
-            # Workaround for a special case (Chrome Releases bug?):
-            if not 'the-stable-channel-has-been-updated-to' in url:
-                continue
-        else:
+        if (
+            target_version
+            and entry.title == ''
+            and 'the-stable-channel-has-been-updated-to' not in url
+            or not target_version
+            or entry.title != ''
+        ):
             continue
     content = entry.content[0].value
     content = html_tags.sub('', content)  # Remove any HTML tags
     if re.search(r'Linux', content) is None:
         continue
     #print(url)  # For debugging purposes
-    version = re.search(r'\d+(\.\d+){3}', content).group(0)
+    version = re.search(r'\d+(\.\d+){3}', content)[0]
     if target_version:
         if version != target_version:
             continue
     else:
-        print('chromium: TODO -> ' + version + '\n')
+        print(f'chromium: TODO -> {version}' + '\n')
     print(url)
     if fixes := re.search(r'This update includes .+ security fix(es)?\.', content):
-        fixes = fixes.group(0)
+        fixes = fixes[0]
         if zero_days := re.search(r'Google is aware( of reports)? th(e|at) .+ in the wild\.', content):
-            fixes += " " + zero_days.group(0)
+            fixes += f" {zero_days[0]}"
         print('\n' + '\n'.join(textwrap.wrap(fixes, width=72)))
     if cve_list := re.findall(r'CVE-[^: ]+', content):
         cve_list = list(OrderedDict.fromkeys(cve_list))  # Remove duplicates but preserve the order

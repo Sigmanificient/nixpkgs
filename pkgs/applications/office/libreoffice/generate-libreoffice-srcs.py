@@ -32,20 +32,20 @@ def main():
         tarball = x['tarball']
 
         url = construct_url(x)
-        print('url: {}'.format(url), file=sys.stderr)
+        print(f'url: {url}', file=sys.stderr)
 
         path = download(url, tarball, hash, hashtype)
-        print('path: {}'.format(path), file=sys.stderr)
+        print(f'path: {path}', file=sys.stderr)
 
         sha256 = get_sha256(path)
-        print('sha256: {}'.format(sha256), file=sys.stderr)
+        print(f'sha256: {sha256}', file=sys.stderr)
 
         print('  {')
-        print('    name = "{}";'.format(tarball))
-        print('    url = "{}";'.format(url))
-        print('    sha256 = "{}";'.format(sha256))
-        print('    md5 = "{}";'.format(md5))
-        print('    md5name = "{}-{}";'.format(md5 or upstream_sha256,tarball))
+        print(f'    name = "{tarball}";')
+        print(f'    url = "{url}";')
+        print(f'    sha256 = "{sha256}";')
+        print(f'    md5 = "{md5}";')
+        print(f'    md5name = "{md5 or upstream_sha256}-{tarball}";')
         print('  }')
 
     print(']')
@@ -53,11 +53,9 @@ def main():
 
 def construct_url(x):
     if x['brief']:
-        return 'https://dev-www.libreoffice.org/src/{}{}'.format(
-            x.get('subdir', ''), x['tarball'])
+        return f"https://dev-www.libreoffice.org/src/{x.get('subdir', '')}{x['tarball']}"
     else:
-        return 'https://dev-www.libreoffice.org/src/{}{}-{}'.format(
-            x.get('subdir', ''), x['md5'], x['tarball'])
+        return f"https://dev-www.libreoffice.org/src/{x.get('subdir', '')}{x['md5']}-{x['tarball']}"
 
 
 def download(url, name, hash, hashtype):
@@ -165,9 +163,7 @@ def get_lines():
 
 def print_skipped_line(x):
 
-    print('Skipped line {}: {}'.format(x['index'],
-                                       x['original']),
-          file=sys.stderr)
+    print(f"Skipped line {x['index']}: {x['original']}", file=sys.stderr)
 
 
 def parse_lines(lines):
@@ -201,13 +197,8 @@ def parse_line(line):
     if re.match('\s*(#.*)?$', line):
         return 'nothing'
 
-    match = re.match('([^:\s]+)\s*:=\s*(.*)$', line)
-
-    if match:
-        return {
-            'key': match.group(1),
-            'value': match.group(2).strip()
-        }
+    if match := re.match('([^:\s]+)\s*:=\s*(.*)$', line):
+        return {'key': match[1], 'value': match[2].strip()}
     else:
         return 'unrecognized'
 
@@ -270,18 +261,12 @@ def interpret_md5(x):
     {'name': 'ODFGEN', 'attrs': {'md5': '32572ea48d9021bbd6fa317ddb697abc'}}
     """
 
-    match = re.match('^(.*)_MD5SUM$', x['key'])
-
-    if match:
-        return {'name': match.group(1),
-                'attrs': {'md5': x['value'], 'sha256': ''}}
+    if match := re.match('^(.*)_MD5SUM$', x['key']):
+        return {'name': match[1], 'attrs': {'md5': x['value'], 'sha256': ''}}
 
 def interpret_sha256(x):
-    match = re.match('^(.*)_SHA256SUM$', x['key'])
-
-    if match:
-        return {'name': match.group(1),
-                'attrs': {'sha256': x['value'], 'md5': ''}}
+    if match := re.match('^(.*)_SHA256SUM$', x['key']):
+        return {'name': match[1], 'attrs': {'sha256': x['value'], 'md5': ''}}
 
 def interpret_tarball(x):
     """
@@ -290,18 +275,12 @@ def interpret_tarball(x):
      'attrs': {'tarball': 'libfreehand-0.1.1.tar.bz2', 'brief': True}}
     """
 
-    match = re.match('^(.*)_TARBALL$', x['key'])
-
-    if match:
-        return {'name': match.group(1),
-                'attrs': {'tarball': x['value'], 'brief': True}}
+    if match := re.match('^(.*)_TARBALL$', x['key']):
+        return {'name': match[1], 'attrs': {'tarball': x['value'], 'brief': True}}
 
 def interpret_jar(x):
-    match = re.match('^(.*)_JAR$', x['key'])
-
-    if match:
-        return {'name': match.group(1),
-                'attrs': {'tarball': x['value'], 'brief': True}}
+    if match := re.match('^(.*)_JAR$', x['key']):
+        return {'name': match[1], 'attrs': {'tarball': x['value'], 'brief': True}}
 
 
 def interpret_tarball_with_md5(x):

@@ -27,7 +27,7 @@ def gen_fingerprint(pubkey: str):
 
 def gen_email(username: str):
     """username seems to be a 21 characters long number string, so mimic that in a reproducible way"""
-    return str(int(hashlib.sha256(username.encode()).hexdigest(), 16))[0:21]
+    return str(int(hashlib.sha256(username.encode()).hexdigest(), 16))[:21]
 
 
 def gen_mockuser(username: str, uid: str, gid: str, home_directory: str, snakeoil_pubkey: str) -> Dict:
@@ -103,8 +103,6 @@ class ReqHandler(BaseHTTPRequestHandler):
             self._send_json_ok(gen_mockuser(username=username, uid=uid, gid=uid, home_directory=f"/home/{username}", snakeoil_pubkey=SNAKEOIL_PUBLIC_KEY))
             return
 
-        # we need to provide something at the groups endpoint.
-        # the nss module does segfault if we don't.
         elif pu.path == "/computeMetadata/v1/oslogin/groups":
             self._send_json_ok({
                 "posixGroups": [
@@ -113,25 +111,23 @@ class ReqHandler(BaseHTTPRequestHandler):
             })
             return
 
-        # authorize endpoint
         elif pu.path == "/computeMetadata/v1/oslogin/authorize":
             # is user allowed to login?
             if params.get("policy") == ["login"]:
                 # mockuser and mockadmin are allowed to login
-                if params.get('email') == [gen_email(MOCKUSER)] or params.get('email') == [gen_email(MOCKADMIN)]:
+                if params.get('email') in [
+                    [gen_email(MOCKUSER)],
+                    [gen_email(MOCKADMIN)],
+                ]:
                     self._send_json_success()
                     return
                 self._send_json_success(False)
-                return
-            # is user allowed to become root?
             elif params.get("policy") == ["adminLogin"]:
                 # only mockadmin is allowed to become admin
                 self._send_json_success((params['email'] == [gen_email(MOCKADMIN)]))
-                return
-            # send 404 for other policies
             else:
                 self._send_404()
-                return
+            return
         else:
             sys.stderr.write(f"Unhandled path: {p}\n")
             sys.stderr.flush()

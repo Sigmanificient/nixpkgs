@@ -119,13 +119,7 @@ from collections import defaultdict
 
 
 def debug(msg, *args, **kwargs):
-    if False:
-        print(
-            "DEBUG: {}".format(
-                msg.format(*args, **kwargs)
-            ),
-            file=sys.stderr
-        )
+    pass
 
 
 # Find paths in the original dataset which are never referenced by
@@ -350,10 +344,10 @@ def make_graph_segment_from_root(root, lookup):
         # Python's assignment will use a pointer, preventing memory
         # bloat for large graphs.
         if ref not in subgraphs_cache:
-            debug("Subgraph Cache miss on {}".format(ref))
+            debug(f"Subgraph Cache miss on {ref}")
             subgraphs_cache[ref] = make_graph_segment_from_root(ref, lookup)
         else:
-            debug("Subgraph Cache hit on {}".format(ref))
+            debug(f"Subgraph Cache hit on {ref}")
         children[ref] = subgraphs_cache[ref]
     return children
 
@@ -472,9 +466,7 @@ def order_by_popularity(paths):
         popularities.append(popularity)
         paths_by_popularity[popularity].append(path)
 
-    popularities = list(set(popularities))
-    popularities.sort()
-
+    popularities = sorted(set(popularities))
     flat_ordered = []
     for popularity in popularities:
         paths = paths_by_popularity[popularity]
@@ -552,11 +544,7 @@ def main():
     debug("Ordering by popularity")
     ordered = order_by_popularity(contest)
     debug("Checking for missing paths")
-    missing = []
-    for path in all_paths(graph):
-        if path not in ordered:
-            missing.append(path)
-
+    missing = [path for path in all_paths(graph) if path not in ordered]
     ordered.extend(missing)
     print("\n".join(ordered))
 

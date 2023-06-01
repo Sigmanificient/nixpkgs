@@ -17,9 +17,9 @@ for f in sys.path:
 for name, duplicates in packages.items():
     if len(duplicates) > 1:
         do_abort = True
-        print("Found duplicated packages in closure for dependency '{}': ".format(name))
+        print(f"Found duplicated packages in closure for dependency '{name}': ")
         for dup in duplicates:
-            print("  " + repr(dup))
+            print(f"  {repr(dup)}")
 
 if do_abort:
     print("")

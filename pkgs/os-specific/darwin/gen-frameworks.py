@@ -120,16 +120,15 @@ def scan_sdk(sdk):
         # Filter out modules that are not separate derivations.
         # Also filter out duplicates (when a Swift overlay imports the Clang module)
         allowed = frameworks + ALLOWED_LIBS
-        deps = set([dep for dep in deps if dep in allowed])
+        deps = {dep for dep in deps if dep in allowed}
 
         # Filter out self-references. (Swift overlay importing Clang module.)
         if framework in deps:
             deps.remove(framework)
 
         # Generate a Nix attribute line.
-        if len(deps) != 0:
-            deps = list(deps)
-            deps.sort()
+        if deps:
+            deps = sorted(deps)
             deps = " ".join(deps)
             output += f"  {framework.ljust(width)} = {{ inherit {deps}; }};\n"
         else:

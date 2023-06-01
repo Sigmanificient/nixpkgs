@@ -28,14 +28,9 @@ ShellVersion = str
 Uuid = str
 ExtensionVersion = int
 
-# Keep track of all names that have been used till now to detect collisions.
-# This works because we deterministically process all extensions in historical order
-# The outer dict level is the shell version, as we are tracking duplicates only per same Shell version.
-# key: shell version, value: Dict with key: pname, value: list of UUIDs with that pname
-package_name_registry: Dict[ShellVersion, Dict[PackageName, List[Uuid]]] = {}
-for shell_version in supported_versions.keys():
-    package_name_registry[shell_version] = {}
-
+package_name_registry: Dict[ShellVersion, Dict[PackageName, List[Uuid]]] = {
+    shell_version: {} for shell_version in supported_versions
+}
 updater_dir_path = Path(__file__).resolve().parent
 
 
@@ -82,20 +77,15 @@ def generate_extension_versions(
     # Determine extension version per shell version
     extension_versions: Dict[ShellVersion, ExtensionVersion] = {}
     for shell_version, version_prefix in supported_versions.items():
-        # Newest compatible extension version
-        extension_version: Optional[int] = max(
+        if extension_version := max(
             (
                 int(ext_ver)
                 for shell_ver, ext_ver in extension_version_map.items()
                 if (shell_ver.startswith(version_prefix))
             ),
             default=None,
-        )
-        # Extension is not compatible with this GNOME version
-        if not extension_version:
-            continue
-
-        extension_versions[shell_version] = extension_version
+        ):
+            extension_versions[shell_version] = extension_version
 
     # Download information once for all extension versions chosen above
     extension_info_cache: Dict[ExtensionVersion, Tuple[str, str]] = {}
@@ -195,7 +185,7 @@ def process_extension(extension: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # Fetch a human-readable name for the package.
     (pname, _pname_id) = pname_from_url(extension["link"])
 
-    for shell_version in shell_version_map.keys():
+    for shell_version in shell_version_map:
         if pname in package_name_registry[shell_version]:
             logging.warning(f"Package name '{pname}' for GNOME '{shell_version}' is colliding.")
             package_name_registry[shell_version][pname].append(uuid)
@@ -223,17 +213,15 @@ def scrape_extensions_index() -> List[Dict[str, Any]]:
     extensions = []
     while True:
         page += 1
-        logging.info("Scraping page " + str(page))
+        logging.info(f"Scraping page {page}")
         try:
             with urllib.request.urlopen(
-                    f"https://extensions.gnome.org/extension-query/?n_per_page=25&page={page}"
-            ) as response:
+                                f"https://extensions.gnome.org/extension-query/?n_per_page=25&page={page}"
+                        ) as response:
                 data = json.loads(response.read().decode())["extensions"]
                 response_length = len(data)
 
-                for extension in data:
-                    extensions.append(extension)
-
+                extensions.extend(iter(data))
                 # If our page isn't "full", it must have been the last one
                 if response_length < 25:
                     logging.debug(
@@ -261,8 +249,7 @@ if __name__ == "__main__":
     logging.info(f"Downloaded {len(raw_extensions)} extensions. Processing …")
     processed_extensions: List[Dict[str, Any]] = []
     for num, raw_extension in enumerate(raw_extensions):
-        processed_extension = process_extension(raw_extension)
-        if processed_extension:
+        if processed_extension := process_extension(raw_extension):
             processed_extensions.append(processed_extension)
             logging.debug(f"Processed {num + 1} / {len(raw_extensions)}")
 

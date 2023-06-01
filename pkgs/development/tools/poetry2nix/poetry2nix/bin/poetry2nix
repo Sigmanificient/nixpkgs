@@ -124,11 +124,7 @@ def main() -> None:
                 pkgs.append(UrlPackage(pkg))
 
     with ThreadPoolExecutor() as e:
-        futures = []
-
-        for pkg in pkgs:
-            futures.append(e.submit(pkg.fetch))
-
+        futures = [e.submit(pkg.fetch) for pkg in pkgs]
         lines = [
             "{ pkgs }:",
             "self: super: {",

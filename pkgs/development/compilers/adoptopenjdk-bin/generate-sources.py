@@ -22,7 +22,10 @@ arch_to_nixos = {
 def get_sha256(url):
     resp = requests.get(url)
     if resp.status_code != 200:
-        print("error: could not fetch checksum from url {}: code {}".format(url, resp.status_code), file=sys.stderr)
+        print(
+            f"error: could not fetch checksum from url {url}: code {resp.status_code}",
+            file=sys.stderr,
+        )
         sys.exit(1)
     return resp.text.strip().split(" ")[0]
 
@@ -57,9 +60,14 @@ def generate_sources(release, assets):
 
 out = {}
 for release in releases:
-    resp = requests.get("https://api.adoptopenjdk.net/v2/latestAssets/releases/" + release)
+    resp = requests.get(
+        f"https://api.adoptopenjdk.net/v2/latestAssets/releases/{release}"
+    )
     if resp.status_code != 200:
-        print("error: could not fetch data for release {} (code {})".format(release, resp.code), file=sys.stderr)
+        print(
+            f"error: could not fetch data for release {release} (code {resp.code})",
+            file=sys.stderr,
+        )
         sys.exit(1)
     out[release] = generate_sources(release, resp.json())
 

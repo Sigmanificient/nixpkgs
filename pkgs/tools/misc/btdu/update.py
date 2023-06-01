@@ -17,20 +17,14 @@ def grabDepHashes(key,pkgbuild=pkgbuild):
     start = pkgbuild.find(key) + len(key)
     end = start+64
     hashes = []
-    for i in range(5):
+    for _ in range(5):
         hashes.append(pkgbuild[start:end])
         start     = pkgbuild.find("'",end+1) + 1
         end       = start+64
     return hashes
 
 def findLine(key,derivation):
-    count = 0
-    lines = []
-    for line in derivation:
-        if key in line:
-            lines.append(count)
-        count += 1
-    return lines
+    return [count for count, line in enumerate(derivation) if key in line]
 
 def updateVersions(btdu,ae,btrfs,ncurses,containers,derivation):
     key = "let"

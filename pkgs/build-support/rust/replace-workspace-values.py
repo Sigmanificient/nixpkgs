@@ -23,7 +23,7 @@ def replace_key(
         and "workspace" in table[key]
         and table[key]["workspace"] is True
     ):
-        print("replacing " + key)
+        print(f"replacing {key}")
 
         replaced = table[key]
         del replaced["workspace"]

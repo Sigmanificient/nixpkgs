@@ -70,9 +70,7 @@ class Version(DataClassJsonMixin):
         download avilable, return None.
         """
         downloads = self.get_downloads()
-        if "server" in downloads:
-            return downloads["server"]
-        return None
+        return downloads["server"] if "server" in downloads else None
 
 
 def get_versions() -> List[Version]:
@@ -90,7 +88,7 @@ def get_major_release(version_id: str) -> str:
     Return the major release for a version. The major release for 1.17 and
     1.17.1 is 1.17.
     """
-    if not len(version_id.split(".")) >= 2:
+    if len(version_id.split(".")) < 2:
         raise ValueError(f"version not in expected format: '{version_id}'")
     return ".".join(version_id.split(".")[:2])
 

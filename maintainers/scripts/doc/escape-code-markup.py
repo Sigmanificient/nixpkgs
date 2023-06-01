@@ -16,7 +16,7 @@ def replace_element_by_text(el: ET.Element, text: str) -> None:
     Source: https://stackoverflow.com/a/10520552/160386
     SPDX-License-Identifier: CC-BY-SA-3.0
     """
-    text = text + (el.tail or "")
+    text += (el.tail or "")
     parent = el.getparent()
     if parent is not None:
         previous = el.getprevious()
@@ -66,7 +66,7 @@ def remove_xmlns(match: re.Match) -> str:
 
     Expects a match containing an opening tag.
     """
-    return XMLNS_REGEX.sub('', match.group(0))
+    return XMLNS_REGEX.sub('', match[0])
 
 if __name__ == '__main__':
     assert len(sys.argv) >= 3, "usage: escape-code-markup.py <input> <output>"

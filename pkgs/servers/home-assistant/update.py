@@ -97,13 +97,7 @@ class File:
 class Nurl:
     @classmethod
     async def prefetch(cls, url: str, version: str, *extra_args: str) -> str:
-        cmd = [
-            "nurl",
-            "--hash",
-            url,
-            version,
-        ]
-        cmd.extend(extra_args)
+        cmd = ["nurl", "--hash", url, version, *extra_args]
         return await check_async(cmd)
 
 
@@ -229,7 +223,7 @@ class HomeAssistant:
 async def main():
     headers = {}
     if token := os.environ.get("GITHUB_TOKEN", None):
-        headers.update({"GITHUB_TOKEN": token})
+        headers["GITHUB_TOKEN"] = token
 
     async with aiohttp.ClientSession(headers=headers) as client:
         hass = HomeAssistant(client)
@@ -239,13 +233,13 @@ async def main():
 
         if Version(core_latest) > Version(core_current):
             print(f"New Home Assistant version {core_latest} is available")
-            await hass.update_core(str(core_current), str(core_latest))
+            await hass.update_core(core_current, str(core_latest))
 
             frontend_current = str(await Nix.eval("home-assistant.frontend.version"))
             frontend_latest = await hass.get_latest_frontend_version(str(core_latest))
 
             if Version(frontend_latest) > Version(frontend_current):
-                await hass.update_frontend(str(frontend_current), str(frontend_latest))
+                await hass.update_frontend(frontend_current, str(frontend_latest))
 
             await hass.update_components()
 

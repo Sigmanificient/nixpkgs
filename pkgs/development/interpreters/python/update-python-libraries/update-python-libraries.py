@@ -67,8 +67,7 @@ def _get_values(attribute, text):
     """
     regex = fr'{re.escape(attribute)}\s+=\s+"(.*)";'
     regex = re.compile(regex)
-    values = regex.findall(text)
-    return values
+    return regex.findall(text)
 
 
 def _get_attr_value(attr_path: str) -> Optional[Any]:
@@ -94,11 +93,11 @@ def _get_unique_value(attribute, text):
     values = _get_values(attribute, text)
     n = len(values)
     if n > 1:
-        raise ValueError("found too many values for {}".format(attribute))
+        raise ValueError(f"found too many values for {attribute}")
     elif n == 1:
         return values[0]
     else:
-        raise ValueError("no value found for {}".format(attribute))
+        raise ValueError(f"no value found for {attribute}")
 
 def _get_line_and_value(attribute, text, value=None):
     """Match attribute in text. Return the line and the value of the attribute."""
@@ -110,11 +109,11 @@ def _get_line_and_value(attribute, text, value=None):
     results = regex.findall(text)
     n = len(results)
     if n > 1:
-        raise ValueError("found too many values for {}".format(attribute))
+        raise ValueError(f"found too many values for {attribute}")
     elif n == 1:
         return results[0]
     else:
-        raise ValueError("no value found for {}".format(attribute))
+        raise ValueError(f"no value found for {attribute}")
 
 
 def _replace_value(attribute, value, text, oldvalue=None):
@@ -124,8 +123,7 @@ def _replace_value(attribute, value, text, oldvalue=None):
     else:
         old_line, old_value = _get_line_and_value(attribute, text, oldvalue)
     new_line = old_line.replace(old_value, value)
-    new_text = text.replace(old_line, new_line)
-    return new_text
+    return text.replace(old_line, new_line)
 
 
 def _fetch_page(url):
@@ -133,20 +131,19 @@ def _fetch_page(url):
     if r.status_code == requests.codes.ok:
         return r.json()
     else:
-        raise ValueError("request for {} failed".format(url))
+        raise ValueError(f"request for {url} failed")
 
 
 def _fetch_github(url):
     headers = {}
-    token = os.environ.get('GITHUB_API_TOKEN')
-    if token:
+    if token := os.environ.get('GITHUB_API_TOKEN'):
         headers["Authorization"] = f"token {token}"
     r = requests.get(url, headers=headers)
 
     if r.status_code == requests.codes.ok:
         return r.json()
     else:
-        raise ValueError("request for {} failed".format(url))
+        raise ValueError(f"request for {url} failed")
 
 
 def _hash_to_sri(algorithm, value):
@@ -189,8 +186,8 @@ def _determine_latest_version(current_version, target, versions):
 
     index = SEMVER[target]
 
-    ceiling = list(current_version[0:index])
-    if len(ceiling) == 0:
+    ceiling = list(current_version[:index])
+    if not ceiling:
         ceiling = None
     else:
         ceiling[-1]+=1
@@ -207,7 +204,7 @@ def _determine_latest_version(current_version, target, versions):
 
 def _get_latest_version_pypi(package, extension, current_version, target):
     """Get latest version and hash from PyPI."""
-    url = "{}/{}/json".format(INDEX, package)
+    url = f"{INDEX}/{package}/json"
     json = _fetch_page(url)
 
     versions = json['releases'].keys()
@@ -216,14 +213,15 @@ def _get_latest_version_pypi(package, extension, current_version, target):
     try:
         releases = json['releases'][version]
     except KeyError as e:
-        raise KeyError('Could not find version {} for {}'.format(version, package)) from e
-    for release in releases:
-        if release['filename'].endswith(extension):
-            # TODO: In case of wheel we need to do further checks!
-            sha256 = release['digests']['sha256']
-            break
-    else:
-        sha256 = None
+        raise KeyError(f'Could not find version {version} for {package}') from e
+    sha256 = next(
+        (
+            release['digests']['sha256']
+            for release in releases
+            if release['filename'].endswith(extension)
+        ),
+        None,
+    )
     return version, sha256, None
 
 
@@ -251,7 +249,7 @@ def _get_latest_version_github(package, extension, current_version, target):
     all_releases = _fetch_github(url)
     releases = list(filter(lambda x: not x['prerelease'], all_releases))
 
-    if len(releases) == 0:
+    if not releases:
         raise ValueError(f"{homepage} does not contain any stable releases")
 
     versions = map(lambda x: strip_prefix(x['tag_name']), releases)
@@ -321,7 +319,7 @@ FORMATS = {
 
 def _determine_fetcher(text):
     # Count occurrences of fetchers.
-    nfetchers = sum(text.count('src = {}'.format(fetcher)) for fetcher in FETCHERS.keys())
+    nfetchers = sum(text.count(f'src = {fetcher}') for fetcher in FETCHERS.keys())
     if nfetchers == 0:
         raise ValueError("no fetcher.")
     elif nfetchers > 1:
@@ -329,7 +327,7 @@ def _determine_fetcher(text):
     else:
         # Then we check which fetcher to use.
         for fetcher in FETCHERS.keys():
-            if 'src = {}'.format(fetcher) in text:
+            if f'src = {fetcher}' in text:
                 return fetcher
 
 
@@ -404,12 +402,12 @@ def _update_package(path, target):
         raise ValueError(f"Unable to find correct package using these pnames: {pnames}")
 
     if new_version == version:
-        logging.info("Path {}: no update available for {}.".format(path, pname))
+        logging.info(f"Path {path}: no update available for {pname}.")
         return False
     elif Version(new_version) <= Version(version):
-        raise ValueError("downgrade for {}.".format(pname))
+        raise ValueError(f"downgrade for {pname}.")
     if not new_sha256:
-        raise ValueError("no file available for {}.".format(pname))
+        raise ValueError(f"no file available for {pname}.")
 
     text = _replace_value('version', new_version, text)
 
@@ -417,16 +415,16 @@ def _update_package(path, target):
     # sri hashes have been the default format since nix 2.4+
     sri_hash = _hash_to_sri("sha256", new_sha256)
 
-    # retrieve the old output hash for a more precise match
-    if old_hash := _get_attr_value(f"python3Packages.{pname}.src.outputHash"):
-        # fetchers can specify a sha256, or a sri hash
-        try:
-            text = _replace_value('hash', sri_hash, text, old_hash)
-        except ValueError:
-            text = _replace_value('sha256', sri_hash, text, old_hash)
-    else:
+    if not (
+        old_hash := _get_attr_value(f"python3Packages.{pname}.src.outputHash")
+    ):
         raise ValueError(f"Unable to retrieve old hash for {pname}")
 
+    # fetchers can specify a sha256, or a sri hash
+    try:
+        text = _replace_value('hash', sri_hash, text, old_hash)
+    except ValueError:
+        text = _replace_value('sha256', sri_hash, text, old_hash)
     if fetcher == 'fetchFromGitHub':
         # in the case of fetchFromGitHub, it's common to see `rev = version;` or `rev = "v${version}";`
         # in which no string value is meant to be substituted. However, we can just overwrite the previous value.
@@ -436,29 +434,26 @@ def _update_package(path, target):
         n = len(matches)
 
         if n == 0:
-            raise ValueError("Unable to find rev value for {}.".format(pname))
-        else:
-            # forcefully rewrite rev, incase tagging conventions changed for a release
-            match = matches[0]
-            text = text.replace(match, f'rev = "refs/tags/{prefix}${{version}}";')
-            # incase there's no prefix, just rewrite without interpolation
-            text = text.replace('"${version}";', 'version;')
+            raise ValueError(f"Unable to find rev value for {pname}.")
+        # forcefully rewrite rev, incase tagging conventions changed for a release
+        match = matches[0]
+        text = text.replace(match, f'rev = "refs/tags/{prefix}${{version}}";')
+        # incase there's no prefix, just rewrite without interpolation
+        text = text.replace('"${version}";', 'version;')
 
     with open(path, 'w') as f:
         f.write(text)
 
-        logging.info("Path {}: updated {} from {} to {}".format(path, pname, version, new_version))
+        logging.info(f"Path {path}: updated {pname} from {version} to {new_version}")
 
-    result = {
-        'path'  : path,
+    return {
+        'path': path,
         'target': target,
         'pname': pname,
-        'old_version'   : version,
-        'new_version'   : new_version,
+        'old_version': version,
+        'new_version': new_version,
         #'fetcher'       : fetcher,
-        }
-
-    return result
+    }
 
 
 def _update(path, target):
@@ -469,18 +464,18 @@ def _update(path, target):
 
     # If a default.nix does not exist, we quit.
     if not os.path.isfile(path):
-        logging.info("Path {}: does not exist.".format(path))
+        logging.info(f"Path {path}: does not exist.")
         return False
 
     # If file is not a Nix expression, we quit.
     if not path.endswith(".nix"):
-        logging.info("Path {}: does not end with `.nix`.".format(path))
+        logging.info(f"Path {path}: does not end with `.nix`.")
         return False
 
     try:
         return _update_package(path, target)
     except ValueError as e:
-        logging.warning("Path {}: {}".format(path, e))
+        logging.warning(f"Path {path}: {e}")
         return False
 
 
@@ -542,7 +537,7 @@ environment variables:
         logging.info("Finished committing updates")
 
     count = len(results)
-    logging.info("{} package(s) updated".format(count))
+    logging.info(f"{count} package(s) updated")
 
 
 

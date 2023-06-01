@@ -65,14 +65,14 @@ class BaseConverter(Converter[md.TR], Generic[md.TR]):
                 if fragment_type not in get_args(FragmentType):
                     raise RuntimeError(f"unsupported structural include type '{typ}'")
                 self._current_type.append(cast(FragmentType, fragment_type))
-                token.type = 'included_' + typ
+                token.type = f'included_{typ}'
                 self._process_include_args(token, args, self.INCLUDE_FRAGMENT_ALLOWED_ARGS)
                 self._parse_included_blocks(token, args)
                 self._current_type.pop()
         return tokens
 
     def _process_include_args(self, token: Token, args: dict[str, str], allowed: set[str]) -> None:
-        ns = self.INCLUDE_ARGS_NS + ":"
+        ns = f"{self.INCLUDE_ARGS_NS}:"
         args = { k[len(ns):]: v for k, v in args.items() if k.startswith(ns) }
         if unknown := set(args.keys()) - allowed:
             assert token.map
@@ -172,7 +172,7 @@ class ManualDocBookRenderer(RendererMixin, DocBookRenderer):
         assert tokens[1].children
         assert tokens[4].children
         if (maybe_id := cast(str, tokens[0].attrs.get('id', ""))):
-            maybe_id = "xml:id=" + xml.quoteattr(maybe_id)
+            maybe_id = f"xml:id={xml.quoteattr(maybe_id)}"
         return (f'<book xmlns="http://docbook.org/ns/docbook"'
                 f'      xmlns:xlink="http://www.w3.org/1999/xlink"'
                 f'      {maybe_id} version="5.0">'
@@ -511,7 +511,7 @@ class HTMLConverter(BaseConverter[ManualHTMLRenderer]):
         tokens = super()._parse(src)
         for token in tokens:
             if not token.type.startswith('included_') \
-               or not (into := token.meta['include-args'].get('into-file')):
+                   or not (into := token.meta['include-args'].get('into-file')):
                 continue
             assert token.map
             if len(token.meta['included']) == 0:
@@ -519,7 +519,9 @@ class HTMLConverter(BaseConverter[ManualHTMLRenderer]):
             # we use blender-style //path to denote paths relative to the origin file
             # (usually index.html). this makes everything a lot easier and clearer.
             if not into.startswith("//") or '/' in into[2:]:
-                raise RuntimeError(f"html:into-file must be a relative-to-origin //filename", into)
+                raise RuntimeError(
+                    "html:into-file must be a relative-to-origin //filename", into
+                )
             into = token.meta['include-args']['into-file'] = into[2:]
             if into in self._redirection_targets:
                 raise RuntimeError(f"redirection target {into} in line {token.map[0] + 1} is already in use")
@@ -596,13 +598,14 @@ class HTMLConverter(BaseConverter[ManualHTMLRenderer]):
             # skip the prepended `Example N. ` from _number_examples
             toc_html, title = self._renderer.renderInline(inlines.children[2:]), title_html
             # xref title wants only the prepended text, sans the trailing colon and space
-            title_html = self._renderer.renderInline(inlines.children[0:1])
+            title_html = self._renderer.renderInline(inlines.children[:1])
         else:
             toc_html, title = title_html, title_html
             title_html = (
                 f"<em>{title_html}</em>"
                 if typ == 'chapter'
-                else title_html if typ in [ 'book', 'part' ]
+                else title_html
+                if typ in {'book', 'part'}
                 else f'the section called “{title_html}”'
             )
         return XrefTarget(id, title_html, toc_html, re.sub('<.*?>', '', title), path, drop_fragment)

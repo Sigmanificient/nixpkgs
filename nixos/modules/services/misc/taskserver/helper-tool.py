@@ -37,7 +37,7 @@ def lazyprop(fun):
     """
     Decorator which only evaluates the specified function when accessed.
     """
-    name = '_lazy_' + fun.__name__
+    name = f'_lazy_{fun.__name__}'
 
     @property
     def _lazy(self):
@@ -158,7 +158,7 @@ def generate_key(org, user):
 
     basedir = os.path.join(TASKD_DATA_DIR, "keys", org, user)
     if os.path.exists(basedir):
-        raise OSError("Keyfile directory for {} already exists.".format(user))
+        raise OSError(f"Keyfile directory for {user} already exists.")
 
     privkey = os.path.join(basedir, "private.key")
     pubcert = os.path.join(basedir, "public.cert")
@@ -170,11 +170,11 @@ def generate_key(org, user):
 
         template_data = [
             "organization = {0}".format(org),
-            "cn = {}".format(FQDN),
-            "expiration_days = {}".format(CLIENT_EXPIRATION),
+            f"cn = {FQDN}",
+            f"expiration_days = {CLIENT_EXPIRATION}",
             "tls_www_client",
             "encryption_key",
-            "signing_key"
+            "signing_key",
         ]
 
         with create_template(template_data) as template:
@@ -194,11 +194,11 @@ def generate_key(org, user):
 def revoke_key(org, user):
     basedir = os.path.join(TASKD_DATA_DIR, "keys", org, user)
     if not os.path.exists(basedir):
-        raise OSError("Keyfile directory for {} doesn't exist.".format(user))
+        raise OSError(f"Keyfile directory for {user} doesn't exist.")
 
     pubcert = os.path.join(basedir, "public.cert")
 
-    expiration = "expiration_days = {}".format(CRL_EXPIRATION)
+    expiration = f"expiration_days = {CRL_EXPIRATION}"
 
     with create_template([expiration]) as template:
         oldcrl = NamedTemporaryFile(mode="wb", prefix="old-crl")
@@ -225,7 +225,7 @@ def getkey(*args):
     path = os.path.join(TASKD_DATA_DIR, "keys", *args)
     buf = []
     for line in open(path, "r"):
-        if len(buf) == 0:
+        if not buf:
             if is_key_line(line, "BEGIN"):
                 buf.append(line)
             continue
@@ -234,12 +234,12 @@ def getkey(*args):
 
         if is_key_line(line, "END"):
             return ''.join(buf)
-    raise IOError("Unable to get key from {}.".format(path))
+    raise IOError(f"Unable to get key from {path}.")
 
 
 def mktaskkey(cfg, path, keydata):
-    heredoc = 'cat > "{}" <<EOF\n{}EOF'.format(path, keydata)
-    cmd = 'task config taskd.{} -- "{}"'.format(cfg, path)
+    heredoc = f'cat > "{path}" <<EOF\n{keydata}EOF'
+    cmd = f'task config taskd.{cfg} -- "{path}"'
     return heredoc + "\n" + cmd
 
 
@@ -252,7 +252,7 @@ class User(object):
     def export(self):
         credentials = '/'.join([self.__org, self.name, self.key])
         allow_unquoted = string.ascii_letters + string.digits + "/-_."
-        if not all((c in allow_unquoted) for c in credentials):
+        if any(c not in allow_unquoted for c in credentials):
             credentials = "'" + credentials.replace("'", r"'\''") + "'"
 
         script = []
@@ -266,16 +266,15 @@ class User(object):
 
             script += [
                 "umask 0077",
-                'mkdir -p "{}"'.format(keydir),
-                mktaskkey("certificate", os.path.join(keydir, "public.cert"),
-                          pubcert),
+                f'mkdir -p "{keydir}"',
+                mktaskkey(
+                    "certificate", os.path.join(keydir, "public.cert"), pubcert
+                ),
                 mktaskkey("key", os.path.join(keydir, "private.key"), privkey),
-                mktaskkey("ca", os.path.join(keydir, "ca.cert"), cacert)
+                mktaskkey("ca", os.path.join(keydir, "ca.cert"), cacert),
             ]
 
-        script.append(
-            "task config taskd.credentials -- {}".format(credentials)
-        )
+        script.append(f"task config taskd.credentials -- {credentials}")
 
         return "\n".join(script) + "\n"
 
@@ -372,10 +371,10 @@ class Organisation(object):
 
     @lazyprop
     def groups(self):
-        result = {}
-        for group in os.listdir(mkpath(self.name, "groups")):
-            result[group] = Group(self.name, group)
-        return result
+        return {
+            group: Group(self.name, group)
+            for group in os.listdir(mkpath(self.name, "groups"))
+        }
 
 
 class Manager(object):
@@ -424,10 +423,10 @@ class Manager(object):
 
     @lazyprop
     def orgs(self):
-        result = {}
-        for org in os.listdir(mkpath()):
-            result[org] = Organisation(org, self.ignore_imperative)
-        return result
+        return {
+            org: Organisation(org, self.ignore_imperative)
+            for org in os.listdir(mkpath())
+        }
 
 
 class OrganisationType(click.ParamType):
@@ -436,7 +435,7 @@ class OrganisationType(click.ParamType):
     def convert(self, value, param, ctx):
         org = Manager().get_org(value)
         if org is None:
-            self.fail("Organisation {} does not exist.".format(value))
+            self.fail(f"Organisation {value} does not exist.")
         return org
 
 ORGANISATION = OrganisationType()
@@ -486,7 +485,7 @@ def list_users(organisation):
     """
     List all users belonging to the specified organisation.
     """
-    label("The following users exists for {}:".format(organisation.name))
+    label(f"The following users exists for {organisation.name}:")
     for user in organisation.users.values():
         sys.stdout.write(user.name + "\n")
 
@@ -497,7 +496,7 @@ def list_groups(organisation):
     """
     List all users belonging to the specified organisation.
     """
-    label("The following users exists for {}:".format(organisation.name))
+    label(f"The following users exists for {organisation.name}:")
     for group in organisation.groups.values():
         sys.stdout.write(group.name + "\n")
 
@@ -524,7 +523,7 @@ def get_uuid(organisation, user):
         msg = "User {} doesn't exist in organisation {}."
         sys.exit(msg.format(userobj.name, organisation.name))
 
-    label("User {} has the following UUID:".format(userobj.name))
+    label(f"User {userobj.name} has the following UUID:")
     sys.stdout.write(user.key + "\n")
 
 
@@ -634,7 +633,7 @@ def del_group(organisation, group):
     Delete a group from the given organisation.
     """
     organisation.del_group(group)
-    click("Group {} deleted.".format(group), err=True)
+    click(f"Group {group} deleted.", err=True)
 
 
 def add_or_delete(old, new, add_fun, del_fun):

@@ -104,11 +104,7 @@ def convert_to_throw(date_older_list: list[str]) -> list[tuple[str, str]]:
         alias_unquoted = before_equal.strip('"')
         after_equal_list = [x.strip(";:") for x in after_equal.split()]
 
-        converted = (
-            f"{indent}{alias} = throw \"'{alias_unquoted}' has been renamed to/replaced by"
-            f" '{after_equal_list.pop(0)}'\";"
-            f' # Converted to throw {datetime.today().strftime("%Y-%m-%d")}'
-        )
+        converted = f"""{indent}{alias} = throw \"'{alias_unquoted}' has been renamed to/replaced by '{after_equal_list.pop(0)}'\"; # Converted to throw {datetime.now().strftime("%Y-%m-%d")}"""
         converted_list.append((line, converted))
 
     return converted_list

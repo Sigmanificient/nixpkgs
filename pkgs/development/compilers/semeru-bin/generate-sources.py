@@ -20,7 +20,10 @@ arch_to_nixos = {
 def get_sha256(url):
     resp = requests.get(url)
     if resp.status_code != 200:
-        print("error: could not fetch checksum from url {}: code {}".format(url, resp.status_code), file=sys.stderr)
+        print(
+            f"error: could not fetch checksum from url {url}: code {resp.status_code}",
+            file=sys.stderr,
+        )
         sys.exit(1)
     return resp.text.strip().split(" ")[0]
 
@@ -76,7 +79,10 @@ for feature_version in feature_versions:
     resp = requests.get(f"https://api.github.com/repos/ibmruntimes/semeru{feature_version}-binaries/releases")
 
     if resp.status_code != 200:
-        print("error: could not fetch data for release {} (code {}) {}".format(feature_version, resp.status_code, resp.content), file=sys.stderr)
+        print(
+            f"error: could not fetch data for release {feature_version} (code {resp.status_code}) {resp.content}",
+            file=sys.stderr,
+        )
         sys.exit(1)
     generate_sources(resp.json(), f"openjdk{feature_version}", out)
 

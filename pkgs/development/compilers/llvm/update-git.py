@@ -43,9 +43,8 @@ def get_current_revision():
     """Get the current revision of llvmPackages_git."""
     with open(DEFAULT_NIX) as f:
         for line in f:
-            rev = re.search(r'^  rev = "(.*)";', line)
-            if rev:
-                return rev.group(1)
+            if rev := re.search(r'^  rev = "(.*)";', line):
+                return rev[1]
     sys.exit(1)
 
 
@@ -61,9 +60,15 @@ chromium_version = chromium_build['version']
 print(f'chromiumDev version: {chromium_version}')
 print('Getting LLVM commit...')
 clang_update_script = get_file_revision(chromium_version, 'tools/clang/scripts/update.py')
-clang_revision = re.search(r"^CLANG_REVISION = '(.+)'$", clang_update_script, re.MULTILINE).group(1)
-clang_commit_short = re.search(r"llvmorg-[0-9]+-init-[0-9]+-g([0-9a-f]{8})", clang_revision).group(1)
-release_version = re.search(r"^RELEASE_VERSION = '(.+)'$", clang_update_script, re.MULTILINE).group(1)
+clang_revision = re.search(
+    r"^CLANG_REVISION = '(.+)'$", clang_update_script, re.MULTILINE
+)[1]
+clang_commit_short = re.search(
+    r"llvmorg-[0-9]+-init-[0-9]+-g([0-9a-f]{8})", clang_revision
+)[1]
+release_version = re.search(
+    r"^RELEASE_VERSION = '(.+)'$", clang_update_script, re.MULTILINE
+)[1]
 commit = get_commit(clang_commit_short)
 if get_current_revision() == commit["sha"]:
     print('No new update available.')
@@ -76,7 +81,7 @@ print('Updating default.nix...')
 with fileinput.FileInput(DEFAULT_NIX, inplace=True) as f:
     for line in f:
         if match := re.search(r'^  rev-version = "unstable-(.+)";', line):
-                old_date = match.group(1)
+            old_date = match[1]
         result = re.sub(r'^  release_version = ".+";', f'  release_version = "{release_version}";', line)
         result = re.sub(r'^  rev = ".*";', f'  rev = "{commit["sha"]}";', result)
         result = re.sub(r'^  rev-version = ".+";', f'  rev-version = "{version}";', result)

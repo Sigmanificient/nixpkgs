@@ -42,8 +42,9 @@ def has_urls(el):
     return ('url' in el and el['url']) or ('urls' in el and el['urls'])
 def has_sha256(el):
     return 'sha256' in el and el['sha256']
-bad_archives = list(filter(lambda el: not has_urls(el) or not has_sha256(el), d.values()))
-if bad_archives:
+if bad_archives := list(
+    filter(lambda el: not has_urls(el) or not has_sha256(el), d.values())
+):
     print('Following bazel dependencies are missing url or sha256', file=sys.stderr)
     print('Check bazel sources for master or non-checksummed dependencies', file=sys.stderr)
     for el in bad_archives:

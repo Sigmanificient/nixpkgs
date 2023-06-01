@@ -72,16 +72,18 @@ def write_loader_conf(profile: Optional[str], generation: int, specialisation: O
 
 
 def profile_path(profile: Optional[str], generation: int, specialisation: Optional[str], name: str) -> str:
-    return os.path.realpath("%s/%s" % (system_dir(profile, generation, specialisation), name))
+    return os.path.realpath(
+        f"{system_dir(profile, generation, specialisation)}/{name}"
+    )
 
 
 def copy_from_profile(profile: Optional[str], generation: int, specialisation: Optional[str], name: str, dry_run: bool = False) -> str:
     store_file_path = profile_path(profile, generation, specialisation, name)
     suffix = os.path.basename(store_file_path)
     store_dir = os.path.basename(os.path.dirname(store_file_path))
-    efi_file_path = "/efi/nixos/%s-%s.efi" % (store_dir, suffix)
+    efi_file_path = f"/efi/nixos/{store_dir}-{suffix}.efi"
     if not dry_run:
-        copy_if_not_exists(store_file_path, "@efiSysMountPoint@%s" % (efi_file_path))
+        copy_if_not_exists(store_file_path, f"@efiSysMountPoint@{efi_file_path}")
     return efi_file_path
 
 
@@ -93,17 +95,13 @@ def describe_generation(profile: Optional[str], generation: int, specialisation:
         nixos_version = "Unknown"
 
     kernel_dir = os.path.dirname(profile_path(profile, generation, specialisation, "kernel"))
-    module_dir = glob.glob("%s/lib/modules/*" % kernel_dir)[0]
+    module_dir = glob.glob(f"{kernel_dir}/lib/modules/*")[0]
     kernel_version = os.path.basename(module_dir)
 
     build_time = int(os.path.getctime(system_dir(profile, generation, specialisation)))
     build_date = datetime.datetime.fromtimestamp(build_time).strftime('%F')
 
-    description = "@distroName@ {}, Linux Kernel {}, Built on {}".format(
-        nixos_version, kernel_version, build_date
-    )
-
-    return description
+    return f"@distroName@ {nixos_version}, Linux Kernel {kernel_version}, Built on {build_date}"
 
 
 def write_entry(profile: Optional[str], generation: int, specialisation: Optional[str],
@@ -112,12 +110,13 @@ def write_entry(profile: Optional[str], generation: int, specialisation: Optiona
     initrd = copy_from_profile(profile, generation, specialisation, "initrd")
 
     title = "@distroName@{profile}{specialisation}".format(
-        profile=" [" + profile + "]" if profile else "",
-        specialisation=" (%s)" % specialisation if specialisation else "")
+        profile=f" [{profile}]" if profile else "",
+        specialisation=f" ({specialisation})" if specialisation else "",
+    )
 
     try:
         append_initrd_secrets = profile_path(profile, generation, specialisation, "append-initrd-secrets")
-        subprocess.check_call([append_initrd_secrets, "@efiSysMountPoint@%s" % (initrd)])
+        subprocess.check_call([append_initrd_secrets, f"@efiSysMountPoint@{initrd}"])
     except FileNotFoundError:
         pass
     except subprocess.CalledProcessError:
@@ -129,10 +128,11 @@ def write_entry(profile: Optional[str], generation: int, specialisation: Optiona
                   f'for "{title} - Configuration {generation}", an older generation', file=sys.stderr)
             print("note: this is normal after having removed "
                   "or renamed a file in `boot.initrd.secrets`", file=sys.stderr)
-    entry_file = "@efiSysMountPoint@/loader/entries/%s" % (
-        generation_conf_filename(profile, generation, specialisation))
-    tmp_path = "%s.tmp" % (entry_file)
-    kernel_params = "init=%s " % profile_path(profile, generation, specialisation, "init")
+    entry_file = f"@efiSysMountPoint@/loader/entries/{generation_conf_filename(profile, generation, specialisation)}"
+    tmp_path = f"{entry_file}.tmp"
+    kernel_params = (
+        f'init={profile_path(profile, generation, specialisation, "init")} '
+    )
 
     with open(profile_path(profile, generation, specialisation, "kernel-params")) as params_file:
         kernel_params = kernel_params + params_file.read()
@@ -192,21 +192,22 @@ def remove_old_entries(gens: List[SystemIdentifier]) -> None:
     rex_generation = re.compile("^@efiSysMountPoint@/loader/entries/nixos.*-generation-([0-9]+)(-specialisation-.*)?\.conf$")
     known_paths = []
     for gen in gens:
-        known_paths.append(copy_from_profile(*gen, "kernel", True))
-        known_paths.append(copy_from_profile(*gen, "initrd", True))
+        known_paths.extend(
+            (
+                copy_from_profile(*gen, "kernel", True),
+                copy_from_profile(*gen, "initrd", True),
+            )
+        )
     for path in glob.iglob("@efiSysMountPoint@/loader/entries/nixos*-generation-[1-9]*.conf"):
-        if rex_profile.match(path):
-            prof = rex_profile.sub(r"\1", path)
-        else:
-            prof = None
+        prof = rex_profile.sub(r"\1", path) if rex_profile.match(path) else None
         try:
             gen_number = int(rex_generation.sub(r"\1", path))
         except ValueError:
             continue
-        if not (prof, gen_number, None) in gens:
+        if (prof, gen_number, None) not in gens:
             os.unlink(path)
     for path in glob.iglob("@efiSysMountPoint@/efi/nixos/*"):
-        if not path in known_paths and not os.path.isdir(path):
+        if path not in known_paths and not os.path.isdir(path):
             os.unlink(path)
 
 
@@ -273,17 +274,19 @@ def main() -> None:
         if available_match is None:
             raise Exception("could not determine systemd-boot version")
 
-        installed_version = version.parse(installed_match.group(1))
-        available_version = version.parse(available_match.group(1))
+        installed_version = version.parse(installed_match[1])
+        available_version = version.parse(available_match[1])
 
         # systemd 252 has a regression that leaves some machines unbootable, so we skip that update.
         # The fix is in 252.2
         # See https://github.com/systemd/systemd/issues/25363 and https://github.com/NixOS/nixpkgs/pull/201558#issuecomment-1348603263
         if installed_version < available_version:
             if version.parse('252') <= available_version < version.parse('252.2'):
-                print("skipping systemd-boot update to %s because of known regression" % available_version)
+                print(
+                    f"skipping systemd-boot update to {available_version} because of known regression"
+                )
             else:
-                print("updating systemd-boot from %s to %s" % (installed_version, available_version))
+                print(f"updating systemd-boot from {installed_version} to {available_version}")
                 subprocess.check_call(["@systemd@/bin/bootctl", "--esp-path=@efiSysMountPoint@"] + bootctl_flags + ["update"])
 
     mkdir_p("@efiSysMountPoint@/efi/nixos")
@@ -302,13 +305,14 @@ def main() -> None:
             if is_default:
                 write_loader_conf(*gen)
         except OSError as e:
-            # See https://github.com/NixOS/nixpkgs/issues/114552
-            if e.errno == errno.EINVAL:
-                profile = f"profile '{gen.profile}'" if gen.profile else "default profile"
-                print("ignoring {} in the list of boot entries because of the following error:\n{}".format(profile, e), file=sys.stderr)
-            else:
+            if e.errno != errno.EINVAL:
                 raise e
 
+            profile = f"profile '{gen.profile}'" if gen.profile else "default profile"
+            print(
+                f"ignoring {profile} in the list of boot entries because of the following error:\n{e}",
+                file=sys.stderr,
+            )
     for root, _, files in os.walk('@efiSysMountPoint@/efi/nixos/.extra-files', topdown=False):
         relative_root = root.removeprefix("@efiSysMountPoint@/efi/nixos/.extra-files").removeprefix("/")
         actual_root = os.path.join("@efiSysMountPoint@", relative_root)
@@ -334,7 +338,7 @@ def main() -> None:
     # event sync the efi filesystem after each update.
     rc = libc.syncfs(os.open("@efiSysMountPoint@", os.O_RDONLY))
     if rc != 0:
-        print("could not sync @efiSysMountPoint@: {}".format(os.strerror(rc)), file=sys.stderr)
+        print(f"could not sync @efiSysMountPoint@: {os.strerror(rc)}", file=sys.stderr)
 
 
 if __name__ == '__main__':

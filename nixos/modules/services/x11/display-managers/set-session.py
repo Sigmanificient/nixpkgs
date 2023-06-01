@@ -17,9 +17,9 @@ def get_session_file(session):
     )
 
     session_files = OrderedSet(
-        os.path.join(dir, session + ".desktop")
+        os.path.join(dir, f"{session}.desktop")
         for dir in session_dirs
-        if os.path.exists(os.path.join(dir, session + ".desktop"))
+        if os.path.exists(os.path.join(dir, f"{session}.desktop"))
     )
 
     # Deal with duplicate wayland-sessions and xsessions.
@@ -34,11 +34,10 @@ def get_session_file(session):
             session for session in session_files if is_session_xsession(session)
         )
 
-    if len(session_files) == 0:
-        logging.warning("No session files are found.")
-        sys.exit(0)
-    else:
+    if len(session_files) != 0:
         return session_files[0]
+    logging.warning("No session files are found.")
+    sys.exit(0)
 
 
 def is_session_xsession(session_file):
@@ -66,23 +65,22 @@ def main():
     for user in users:
         if user.is_system_account():
             continue
+        if is_session_wayland(session_file):
+            logging.debug(
+                f"Setting session name: {session}, as we found the existing wayland-session: {session_file}"
+            )
+            user.set_session(session)
+            user.set_session_type("wayland")
+        elif is_session_xsession(session_file):
+            logging.debug(
+                f"Setting session name: {session}, as we found the existing xsession: {session_file}"
+            )
+            user.set_x_session(session)
+            user.set_session(session)
+            user.set_session_type("x11")
         else:
-            if is_session_wayland(session_file):
-                logging.debug(
-                    f"Setting session name: {session}, as we found the existing wayland-session: {session_file}"
-                )
-                user.set_session(session)
-                user.set_session_type("wayland")
-            elif is_session_xsession(session_file):
-                logging.debug(
-                    f"Setting session name: {session}, as we found the existing xsession: {session_file}"
-                )
-                user.set_x_session(session)
-                user.set_session(session)
-                user.set_session_type("x11")
-            else:
-                logging.error(f"Couldn't figure out session type for {session_file}")
-                sys.exit(1)
+            logging.error(f"Couldn't figure out session type for {session_file}")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
