@@ -433,6 +433,10 @@ with pkgs;
 
   checkpwn = callPackage ../tools/misc/checkpwn { };
 
+  vera = callPackage ../development/tools/analysis/vera { };
+
+  vera-epitech = callPackage ../development/tools/analysis/vera/epitech.nix { };
+
   chrysalis = callPackage ../applications/misc/chrysalis { };
 
   ciel = callPackage ../tools/package-management/ciel { };
