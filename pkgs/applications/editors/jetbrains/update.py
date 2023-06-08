@@ -38,8 +38,7 @@ def build_version(build):
 
 def latest_build(channel):
     builds = one_or_more(channel["build"])
-    latest = max(builds, key=build_version)
-    return latest
+    return max(builds, key=build_version)
 
 
 def download_sha256(url):

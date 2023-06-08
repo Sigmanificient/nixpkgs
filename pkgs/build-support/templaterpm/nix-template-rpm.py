@@ -61,34 +61,39 @@ class SPECTemplate(object):
     string = string.replace('SPACER_DIR_FOR_REMOVAL','')
     string = '\n'.join(map(lambda line: ' '.join(map(lambda x: x.replace('SOURCE_DIR_SPACER/',('${./' if (self.buildRootInclude is None) else '${buildRoot}/usr/share/buildroot/SOURCES/'))+('}' if (self.buildRootInclude is None) else '') if x.startswith('SOURCE_DIR_SPACER/') else x, line.split(' '))), string.split('\n')))
     string = string.replace('\n','\n    ')
-    string = string.rstrip()
-    return string
+    return string.rstrip()
 
 
   def rewriteName(self, string):
     parts = string.split('-')
-    parts = filter(lambda x: not x == "devel", parts)
-    parts = filter(lambda x: not x == "doc", parts)
+    parts = filter(lambda x: x != "devel", parts)
+    parts = filter(lambda x: x != "doc", parts)
     if len(parts) > 1 and parts[0] in self.packageGroups:
-      return parts[0] + '-' + ''.join(parts[1:2] + map(lambda x: x.capitalize(), parts[2:]))
+      return f'{parts[0]}-' + ''.join(parts[1:2] +
+                                      map(lambda x: x.capitalize(), parts[2:]))
     else:
       return ''.join(parts[:1] + map(lambda x: x.capitalize(), parts[1:]))
 
 
   def rewriteInputs(self,target,inputs):
     camelcase = lambda l: l[:1] + map(lambda x: x.capitalize(), l[1:])
-    filterDevel = lambda l: filter(lambda x: not x == "devel", l)
-    filterDoc = lambda l: filter(lambda x: not x == "doc", l)
+    filterDevel = lambda l: filter(lambda x: x != "devel", l)
+    filterDoc = lambda l: filter(lambda x: x != "doc", l)
     rewrite = lambda l: ''.join(camelcase(filterDoc(filterDevel(l))))
 
     def filterPackageGroup(target):
       if target is None:
-        return [ rewrite(x.split('-')) for x in inputs if (not x.split('-')[0] in self.packageGroups) or (len(x.split('-')) == 1) ]
+        return [
+            rewrite(x.split('-')) for x in inputs if
+            x.split('-')[0] not in self.packageGroups or len(x.split('-')) == 1
+        ]
       elif target in self.packageGroups:
-        return [ target + '_' + rewrite(x.split('-')[1:]) for x in inputs if (x.split('-')[0] == target) and (len(x.split('-')) > 1)]
+        return [
+            f'{target}_' + rewrite(x.split('-')[1:]) for x in inputs
+            if (x.split('-')[0] == target) and (len(x.split('-')) > 1)
+        ]
       else:
         raise Exception("Unknown target")
-        return []
 
     if target is None:
       packages = filterPackageGroup(None)
@@ -104,8 +109,6 @@ class SPECTemplate(object):
         packages += tmp
     else:
       raise Exception("Unknown target")
-      packages = []
-
     return packages
 
 
@@ -118,11 +121,10 @@ class SPECTemplate(object):
 
   def getSelfKey(self):
     name = self.spec.sourceHeader['name']
-    if len(name.split('-')) > 1 and name.split('-')[0] in self.packageGroups:
-      key = self.rewriteInputs(name.split('-')[0], [self.spec.sourceHeader['name']])[0]
-    else:
-      key = self.rewriteInputs(None, [self.spec.sourceHeader['name']])[0]
-    return key
+    return (self.rewriteInputs(
+        name.split('-')[0], [self.spec.sourceHeader['name']])[0] if
+            len(name.split('-')) > 1 and name.split('-')[0] in self.packageGroups
+            else self.rewriteInputs(None, [self.spec.sourceHeader['name']])[0])
 
   def getSelf(self):
     if self.translateTable is not None:
@@ -140,14 +142,16 @@ class SPECTemplate(object):
 
 
   def copySources(self, input_dir, output_dir):
-    filenames = [source for (source, _, flag) in self.spec.sources if flag==1 if not urlparse.urlparse(source).scheme in ["http", "https"] ]
+    filenames = [
+        source for (source, _, flag) in self.spec.sources if flag == 1
+        if urlparse.urlparse(source).scheme not in ["http", "https"]
+    ]
     for filename in filenames:
       shutil.copyfile(os.path.join(input_dir, filename), os.path.join(output_dir, filename))
 
 
   def getFacts(self):
-    facts = {}
-    facts["name"] = self.rewriteName(self.spec.sourceHeader['name'])
+    facts = {"name": self.rewriteName(self.spec.sourceHeader['name'])}
     facts["version"] = self.spec.sourceHeader['version']
 
     facts["url"] = []
@@ -162,7 +166,7 @@ class SPECTemplate(object):
 
     patches = [source for (source, _, flag) in self.spec.sources if flag==2]
     if self.buildRootInclude is None:
-      facts["patches"] = map(lambda x: './'+x, patches)
+      facts["patches"] = map(lambda x: f'./{x}', patches)
     else:
       facts["patches"] = map(lambda x: '"${buildRoot}/usr/share/buildroot/SOURCES/'+x+'"', reversed(patches))
 
@@ -182,42 +186,40 @@ class SPECTemplate(object):
     out = ''
     for (url,sha256) in zip(self.facts['url'],self.facts['sha256']):
       out += '  src = fetchurl {\n'
-      out += '    url = "' + url + '";\n'
-      out += '    sha256 = "' + sha256 + '";\n'
+      out += f'    url = "{url}' + '";\n'
+      out += f'    sha256 = "{sha256}' + '";\n'
       out += '  };\n'
     return out
 
 
   @property
   def patch(self):
-    out = '  patches = [ ' + ' '.join(self.facts['patches']) + ' ];\n'
-    return out
+    return '  patches = [ ' + ' '.join(self.facts['patches']) + ' ];\n'
 
 
   @property
   def buildInputs(self):
-    out = '  buildInputs = [ '
-    out += ' '.join(self.getBuildInputs("ALL"))
+    out = '  buildInputs = [ ' + ' '.join(self.getBuildInputs("ALL"))
     out += ' ];\n'
     return out
 
 
   @property
   def configure(self):
-    out = '  configurePhase = \'\'\n    ' + self.rewriteCommands(self.spec.prep) + '\n    \'\';\n';
-    return out
+    return ('  configurePhase = \'\'\n    ' +
+            self.rewriteCommands(self.spec.prep) + '\n    \'\';\n')
 
 
   @property
   def build(self):
-    out = '  buildPhase = \'\'\n    ' + self.rewriteCommands(self.spec.build) + '\n    \'\';\n';
-    return out
+    return ('  buildPhase = \'\'\n    ' + self.rewriteCommands(self.spec.build) +
+            '\n    \'\';\n')
 
 
   @property
   def install(self):
-    out = '  installPhase = \'\'\n    ' + self.rewriteCommands(self.spec.install) + '\n    \'\';\n';
-    return out
+    return ('  installPhase = \'\'\n    ' +
+            self.rewriteCommands(self.spec.install) + '\n    \'\';\n')
 
   @property
   def ocamlExtra(self):
@@ -234,7 +236,7 @@ class SPECTemplate(object):
     out += '    description = "' + self.spec.sourceHeader['summary'] + '";\n'
     out += '    license = lib.licenses.' + self.spec.sourceHeader['license'] + ';\n'
     out += '    platforms = [ "i686-linux" "x86_64-linux" ];\n'
-    out += '    maintainers = with lib.maintainers; [ ' + self.maintainer + ' ];\n'
+    out += f'    maintainers = with lib.maintainers; [ {self.maintainer}' + ' ];\n'
     out += '  };\n'
     out += '}\n'
     return out
@@ -266,24 +268,20 @@ class SPECTemplate(object):
 
 
   def __cmp__(self,other):
-    if self.getSelf() in other.getBuildInputs("ALL"):
-      return 1
-    else:
-      return -1
+    return 1 if self.getSelf() in other.getBuildInputs("ALL") else -1
 
 
   def callPackage(self):
-    callPackage = '  ' + self.getSelf() + ' = callPackage ' + os.path.relpath(self.final_output_dir, self.allPackagesDir) + ' {'
+    callPackage = (
+        f'  {self.getSelf()} = callPackage {os.path.relpath(self.final_output_dir, self.allPackagesDir)}'
+        + ' {')
     newline = False;
     for target in self.packageGroups:
       tmp = self.getBuildInputs(target)
       if len(tmp) > 0:
         newline = True;
         callPackage += '\n    ' + 'inherit (' + target + 'Packages) ' + ' '.join(tmp) + ';'
-    if newline:
-      callPackage += '\n  };'
-    else:
-      callPackage += ' };'
+    callPackage += '\n  };' if newline else ' };'
     return callPackage
 
 
@@ -296,10 +294,8 @@ class SPECTemplate(object):
       self.copySources(self.inputDir, self.final_output_dir)
       self.copyPatches(self.inputDir, self.final_output_dir)
 
-    nixfile = open(os.path.join(self.final_output_dir,'default.nix'), 'w')
-    nixfile.write(str(self))
-    nixfile.close()
-
+    with open(os.path.join(self.final_output_dir,'default.nix'), 'w') as nixfile:
+      nixfile.write(str(self))
     shutil.copyfile(self.specFilename, os.path.join(self.final_output_dir, os.path.basename(self.specFilename)))
 
 
@@ -308,10 +304,8 @@ class SPECTemplate(object):
     if not os.path.exists(self.final_output_dir):
       os.makedirs(self.final_output_dir)
 
-    nixfile = open(os.path.join(self.final_output_dir,'default.nix'), 'w')
-    nixfile.write(self.getTemplate())
-    nixfile.close()
-
+    with open(os.path.join(self.final_output_dir,'default.nix'), 'w') as nixfile:
+      nixfile.write(self.getTemplate())
     return self.getInclude()
 
 
@@ -335,31 +329,30 @@ class NixTemplate(object):
           sha256 = re.match(r'^\s*sha256\s*=\s*"(.*?)"\s*;\s*$', line)
           patches = re.match(r'^\s*patches\s*=\s*(\[.*?\])\s*;\s*$', line)
           if name is not None and self.original["name"] is None:
-              self.original["name"] = name.group(1)
-              self.matchedLines[n] = "name"
+            self.original["name"] = name[1]
+            self.matchedLines[n] = "name"
           if version is not None and self.original["version"] is None:
-              self.original["version"] = version.group(1)
-              self.matchedLines[n] = "version"
+            self.original["version"] = version[1]
+            self.matchedLines[n] = "version"
           if url is not None and self.original["url"] is None:
-              self.original["url"] = url.group(1)
-              self.matchedLines[n] = "url"
+            self.original["url"] = url[1]
+            self.matchedLines[n] = "url"
           if sha256 is not None and self.original["sha256"] is None:
-              self.original["sha256"] = sha256.group(1)
-              self.matchedLines[n] = "sha256"
+            self.original["sha256"] = sha256[1]
+            self.matchedLines[n] = "sha256"
           if patches is not None and self.original["patches"] is None:
-              self.original["patches"] = patches.group(1)
-              self.matchedLines[n] = "patches"
+            self.original["patches"] = patches[1]
+            self.matchedLines[n] = "patches"
 
 
   def generateUpdated(self, nixOut):
-    nixTemplateFile = open(os.path.normpath(self.nixfile),'r')
-    nixOutFile = open(os.path.normpath(nixOut),'w')
-    for (n,line) in enumerate(nixTemplateFile):
-      if self.matchedLines.has_key(n) and self.update[self.matchedLines[n]] is not None:
-        nixOutFile.write(line.replace(self.original[self.matchedLines[n]], self.update[self.matchedLines[n]], 1))
-      else:
-        nixOutFile.write(line)
-    nixTemplateFile.close()
+    with open(os.path.normpath(self.nixfile),'r') as nixTemplateFile:
+      nixOutFile = open(os.path.normpath(nixOut),'w')
+      for (n,line) in enumerate(nixTemplateFile):
+        if self.matchedLines.has_key(n) and self.update[self.matchedLines[n]] is not None:
+          nixOutFile.write(line.replace(self.original[self.matchedLines[n]], self.update[self.matchedLines[n]], 1))
+        else:
+          nixOutFile.write(line)
     nixOutFile.close()
 
 
@@ -391,37 +384,30 @@ class TranslationTable(object):
       for line in infile:
         match = re.match(r'^(.+?)\s+(.+?)\s+(.+?)\s*$', line)
         if match is not None:
-          if not self.tablePath.has_key(match.group(1)):
-            self.tablePath[match.group(1)] = match.group(2)
-          if not self.tableName.has_key(match.group(1)):
-            self.tableName[match.group(1)] = match.group(3)
+          if not self.tablePath.has_key(match[1]):
+            self.tablePath[match[1]] = match[2]
+          if not self.tableName.has_key(match[1]):
+            self.tableName[match[1]] = match[3]
         else:
           match = re.match(r'^(.+?)\s+(.+?)\s*$', line)
-          if not self.tablePath.has_key(match.group(1)):
-            self.tablePath[match.group(1)] = match.group(2)
+          if not self.tablePath.has_key(match[1]):
+            self.tablePath[match[1]] = match[2]
 
   def writeTable(self, tableFile):
-    outFile = open(os.path.normpath(tableFile),'w')
-    keys = self.tablePath.keys()
-    keys.sort()
-    for k in keys:
-      if self.tableName.has_key(k):
-        outFile.write( k + " " + self.tablePath[k] + " " + self.tableName[k] + "\n" )
-      else:
-        outFile.write( k + " " + self.tablePath[k] + "\n" )
-    outFile.close()
+    with open(os.path.normpath(tableFile),'w') as outFile:
+      keys = self.tablePath.keys()
+      keys.sort()
+      for k in keys:
+        if self.tableName.has_key(k):
+          outFile.write(f"{k} {self.tablePath[k]} {self.tableName[k]}" + "\n")
+        else:
+          outFile.write(f"{k} {self.tablePath[k]}" + "\n")
 
   def name(self, key):
-   if self.tableName.has_key(key):
-     return self.tableName[key]
-   else:
-     return key
+    return self.tableName[key] if self.tableName.has_key(key) else key
 
   def path(self, key, orig):
-   if self.tablePath.has_key(key):
-     return self.tablePath[key]
-   else:
-     return orig
+    return self.tablePath[key] if self.tablePath.has_key(key) else orig
 
 
 

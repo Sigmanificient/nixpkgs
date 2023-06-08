@@ -35,7 +35,7 @@ class GitLabRepo:
     @property
     def tags(self) -> Iterable[str]:
         """Returns a sorted list of repository tags"""
-        r = requests.get(self.url + "/refs?sort=updated_desc&ref=master").json()
+        r = requests.get(f"{self.url}/refs?sort=updated_desc&ref=master").json()
         tags = r.get("Tags", [])
 
         # filter out versions not matching version_regex
@@ -70,10 +70,12 @@ class GitLabRepo:
 
     def get_yarn_hash(self, rev: str):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            with open(tmp_dir + "/yarn.lock", "w") as f:
+            with open(f"{tmp_dir}/yarn.lock", "w") as f:
                 f.write(self.get_file("yarn.lock", rev))
             return (
-                subprocess.check_output(["prefetch-yarn-deps", tmp_dir + "/yarn.lock"])
+                subprocess.check_output(
+                    ["prefetch-yarn-deps", f"{tmp_dir}/yarn.lock"]
+                )
                 .decode("utf-8")
                 .strip()
             )
@@ -98,7 +100,7 @@ class GitLabRepo:
         :param rev: the rev to fetch at
         :return:
         """
-        return requests.get(self.url + f"/raw/{rev}/{filepath}").text
+        return requests.get(f"{self.url}/raw/{rev}/{filepath}").text
 
     def get_data(self, rev):
         version = self.rev2version(rev)

@@ -63,7 +63,10 @@ for feature_version in feature_versions:
     resp = requests.get(f"https://api.adoptium.net/v3/assets/latest/{feature_version}/hotspot", headers=headers)
 
     if resp.status_code != 200:
-        print("error: could not fetch data for release {} (code {}) {}".format(feature_version, resp.status_code, resp.content), file=sys.stderr)
+        print(
+            f"error: could not fetch data for release {feature_version} (code {resp.status_code}) {resp.content}",
+            file=sys.stderr,
+        )
         sys.exit(1)
     generate_sources(resp.json(), f"openjdk{feature_version}", out)
 

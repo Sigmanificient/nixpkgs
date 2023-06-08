@@ -9,7 +9,16 @@ import requests
 import subprocess
 
 def nix_prefetch_sha256(name):
-    return subprocess.run(['nix-prefetch-url', '--type', 'sha256', 'https://optifine.net/download?f=' + name], capture_output=True, text=True).stdout.strip()
+    return subprocess.run(
+        [
+            'nix-prefetch-url',
+            '--type',
+            'sha256',
+            f'https://optifine.net/download?f={name}',
+        ],
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 
 # fetch download page
 sess = requests.session()
@@ -23,7 +32,7 @@ result = [ expr.search(x) for x in href ]
 
 # format name, version and hash for each file
 catalogue = {}
-for i, r in enumerate(result):
+for r in result:
     index = r.group(1).lower() + r.group(2).replace('.', '_')
     version = r.group(2) + r.group(3)
     catalogue[index] = {
@@ -32,7 +41,7 @@ for i, r in enumerate(result):
     }
 
 # latest version should be the first entry
-if len(catalogue) > 0:
+if catalogue:
     catalogue['optifine-latest'] = list(catalogue.values())[0]
 
 # read previous versions
@@ -47,9 +56,13 @@ changes = [ { 'commitMessage': 'optifinePackages: update versions\n\n' } ]
 # build a longest common subsequence, natural sorted by keys
 for key, value in sorted({**prev, **catalogue}.items(), key=lambda item: [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', item[0])]):
     if key not in prev:
-        changes[0]['commitMessage'] += 'optifinePackages.{}: init at {}\n'.format(key, value['version'])
+        changes[0][
+            'commitMessage'
+        ] += f"optifinePackages.{key}: init at {value['version']}\n"
     elif value['version'] != prev[key]['version']:
-        changes[0]['commitMessage'] += 'optifinePackages.{}: {} -> {}\n'.format(key, prev[key]['version'], value['version'])
+        changes[0][
+            'commitMessage'
+        ] += f"optifinePackages.{key}: {prev[key]['version']} -> {value['version']}\n"
 
 # print the changes in stdout
 print(json.dumps(changes))

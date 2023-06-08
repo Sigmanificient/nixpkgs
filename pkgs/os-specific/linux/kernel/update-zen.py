@@ -34,7 +34,7 @@ def get_commit_date(repo, sha):
         commit = json.loads(http_response.read().decode())
         date = commit['commit']['committer']['date'].rstrip('Z')
         date = datetime.fromisoformat(date).date().isoformat()
-        return 'unstable-' + date
+        return f'unstable-{date}'
 
 
 def nix_prefetch_git(url, rev):
@@ -86,14 +86,12 @@ def read_file(relpath, variant):
     suffix = None
     with fileinput.FileInput(file_path, mode='r') as f:
         for line in f:
-            version_match = re_version.match(line)
-            if version_match:
-                version = version_match.group(1)
+            if version_match := re_version.match(line):
+                version = version_match[1]
                 continue
 
-            suffix_match = re_suffix.match(line)
-            if suffix_match:
-                suffix = suffix_match.group(1)
+            if suffix_match := re_suffix.match(line):
+                suffix = suffix_match[1]
                 continue
 
             if version and suffix:
@@ -110,11 +108,10 @@ if __name__ == "__main__":
     pattern = re.compile(fr"v(\d+\.\d+\.?\d*)-({variant}\d+)")
     zen_tags = github_api_request('repos/zen-kernel/zen-kernel/releases')
     for tag in zen_tags:
-        zen_match = pattern.match(tag['tag_name'])
-        if zen_match:
-            zen_tag = zen_match.group(0)
-            zen_version = zen_match.group(1)
-            zen_suffix = zen_match.group(2)
+        if zen_match := pattern.match(tag['tag_name']):
+            zen_tag = zen_match[0]
+            zen_version = zen_match[1]
+            zen_suffix = zen_match[2]
             break
     old_version, old_suffix = read_file('zen-kernels.nix', variant)
     if old_version != zen_version or old_suffix != zen_suffix:

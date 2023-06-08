@@ -161,11 +161,10 @@ class HTMLRenderer(Renderer):
         if s := token.attrs.get('id'):
             id_part = f'<a id="{escape(cast(str, s), True)}" />'
         if s := token.attrs.get('class'):
-            if s == 'keycap':
-                class_part = '<span class="keycap"><strong>'
-                self._attrspans.append("</strong></span>")
-            else:
+            if s != 'keycap':
                 return super().attr_span_begin(token, tokens, i)
+            class_part = '<span class="keycap"><strong>'
+            self._attrspans.append("</strong></span>")
         else:
             self._attrspans.append("")
         return id_part + class_part
@@ -232,14 +231,13 @@ class HTMLRenderer(Renderer):
             heading = self._headings[-1]
             if heading.container_tag == 'part' and not heading.partintro_closed:
                 self._headings[-1] = heading._replace(partintro_closed=True)
-                return heading.toc_fragment + "</div>"
+                return f"{heading.toc_fragment}</div>"
         return ""
 
     def _close_headings(self, level: Optional[int]) -> str:
         result = []
         while len(self._headings) and (level is None or self._headings[-1].level >= level):
-            result.append(self._maybe_close_partintro())
-            result.append("</div>")
+            result.extend((self._maybe_close_partintro(), "</div>"))
             self._headings.pop()
         return "\n".join(result)
 

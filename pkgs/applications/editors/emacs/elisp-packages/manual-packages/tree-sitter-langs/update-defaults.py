@@ -17,7 +17,7 @@ import os
 
 
 def fmt_grammar(grammar: str) -> str:
-    return "tree-sitter-" + grammar
+    return f"tree-sitter-{grammar}"
 
 
 def eval_expr(nixpkgs: str, expr: str) -> Any:
@@ -63,11 +63,10 @@ if __name__ == "__main__":
 
     grammars = os.listdir(join(src_dir, "repos"))
     for g in grammars:
-        exists = check_grammar_exists(nixpkgs, g)
-        if exists:
+        if exists := check_grammar_exists(nixpkgs, g):
             existing.append(fmt_grammar(g))
         else:
-            sys.stderr.write("Missing grammar: " + fmt_grammar(g) + "\n")
+            sys.stderr.write(f"Missing grammar: {fmt_grammar(g)}" + "\n")
             sys.stderr.flush()
 
     with open(join(cwd, "default-grammars.json"), mode="w") as f:

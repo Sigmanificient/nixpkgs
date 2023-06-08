@@ -62,7 +62,7 @@ class Logger:
     def log_serial(self, message: str, machine: str) -> None:
         self.enqueue({"msg": message, "machine": machine, "type": "serial"})
         if self._print_serial_logs:
-            self._eprint(Style.DIM + f"{machine} # {message}" + Style.RESET_ALL)
+            self._eprint(f"{Style.DIM}{machine} # {message}{Style.RESET_ALL}")
 
     def enqueue(self, item: Dict[str, str]) -> None:
         self.queue.put(item)

@@ -114,7 +114,7 @@ class CommonMarkRenderer(Renderer):
     def blockquote_open(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         pbreak = self._maybe_parbreak()
         self._enter_block("> ")
-        return pbreak + "> "
+        return f"{pbreak}> "
     def blockquote_close(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         self._leave_block()
         return ""
@@ -173,7 +173,7 @@ class CommonMarkRenderer(Renderer):
     def attr_span_end(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         return ""
     def heading_open(self, token: Token, tokens: Sequence[Token], i: int) -> str:
-        return token.markup + " "
+        return f"{token.markup} "
     def heading_close(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         return "\n"
     def ordered_list_open(self, token: Token, tokens: Sequence[Token], i: int) -> str:

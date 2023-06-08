@@ -29,7 +29,7 @@ def get_commit_date(repo, sha):
         commit = json.loads(http_response.read().decode())
         date = commit['commit']['committer']['date'].rstrip('Z')
         date = datetime.fromisoformat(date).date().isoformat()
-        return 'unstable-' + date
+        return f'unstable-{date}'
 
 
 def nix_prefetch_git(url, rev):

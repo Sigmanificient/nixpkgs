@@ -14,7 +14,7 @@ class WiktionaryLatestVersionParser(HTMLParser):
         if tag != 'a':
             return
 
-        href = dict(attrs)['href'][0:-1]
+        href = dict(attrs)['href'][:-1]
         if href == 'latest':
             return
 
@@ -28,11 +28,16 @@ def nix_prefetch_url(url, algo='sha256'):
     return out.rstrip()
 
 
-current_version = subprocess.check_output([
-    'nix', 'eval', '--raw',
-    '-f', dirname(abspath(__file__)) + '/../../../..',
-    'dictdDBs.wiktionary.version',
-])
+current_version = subprocess.check_output(
+    [
+        'nix',
+        'eval',
+        '--raw',
+        '-f',
+        f'{dirname(abspath(__file__))}/../../../..',
+        'dictdDBs.wiktionary.version',
+    ]
+)
 
 parser = WiktionaryLatestVersionParser(current_version)
 

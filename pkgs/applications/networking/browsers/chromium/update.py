@@ -3,6 +3,7 @@
 
 """This script automatically updates chromium, google-chrome, chromedriver, and ungoogled-chromium
 via upstream-info.json."""
+
 # Usage: ./update.py [--commit]
 
 import base64
@@ -23,9 +24,9 @@ RELEASES_URL = 'https://versionhistory.googleapis.com/v1/chrome/platforms/linux/
 DEB_URL = 'https://dl.google.com/linux/chrome/deb/pool/main/g'
 BUCKET_URL = 'https://commondatastorage.googleapis.com/chromium-browser-official'
 
-JSON_PATH = dirname(abspath(__file__)) + '/upstream-info.json'
-UNGOOGLED_FLAGS_PATH = dirname(abspath(__file__)) + '/ungoogled-flags.toml'
-COMMIT_MESSAGE_SCRIPT = dirname(abspath(__file__)) + '/get-commit-message.py'
+JSON_PATH = f'{dirname(abspath(__file__))}/upstream-info.json'
+UNGOOGLED_FLAGS_PATH = f'{dirname(abspath(__file__))}/ungoogled-flags.toml'
+COMMIT_MESSAGE_SCRIPT = f'{dirname(abspath(__file__))}/get-commit-message.py'
 
 
 def load_json(path):
@@ -78,7 +79,7 @@ def get_channel_dependencies(version):
     """Gets all dependencies for the given Chromium version."""
     deps = get_file_revision(version, 'DEPS')
     gn_pattern = b"'gn_version': 'git_revision:([0-9a-f]{40})'"
-    gn_commit = re.search(gn_pattern, deps).group(1).decode()
+    gn_commit = re.search(gn_pattern, deps)[1].decode()
     gn = nix_prefetch_git('https://gn.googlesource.com/gn', gn_commit)
     return {
         'gn': {
@@ -96,7 +97,7 @@ def get_latest_ungoogled_chromium_tag(linux_stable_versions):
     with urlopen(api_tag_url) as http_response:
         tags = json.load(http_response)
         for tag in tags:
-            if not tag['name'].split('-')[0] in linux_stable_versions:
+            if tag['name'].split('-')[0] not in linux_stable_versions:
                 continue
 
             return tag['name']

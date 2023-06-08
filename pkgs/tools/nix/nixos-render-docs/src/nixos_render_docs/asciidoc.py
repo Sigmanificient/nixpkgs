@@ -64,7 +64,12 @@ class AsciiDocRenderer(Renderer):
         self._attrspans = []
 
     def _enter_block(self, is_list: bool) -> None:
-        self._parstack.append(Par("\n+\n" if is_list else "\n\n", self._parstack[-1].block_delim + "="))
+        self._parstack.append(
+            Par(
+                "\n+\n" if is_list else "\n\n",
+                f"{self._parstack[-1].block_delim}=",
+            )
+        )
     def _leave_block(self) -> None:
         self._parstack.pop()
     def _break(self, force: bool = False) -> str:
@@ -104,7 +109,7 @@ class AsciiDocRenderer(Renderer):
     def hardbreak(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         return " +\n"
     def softbreak(self, token: Token, tokens: Sequence[Token], i: int) -> str:
-        return f" "
+        return " "
     def code_inline(self, token: Token, tokens: Sequence[Token], i: int) -> str:
         self._parstack[-1].continuing = True
         return f"``{asciidoc_escape(token.content)}``"
@@ -196,11 +201,10 @@ class AsciiDocRenderer(Renderer):
         if id := token.attrs.get('id'):
             id_part = f"[[{id}]]"
         if s := token.attrs.get('class'):
-            if s == 'keycap':
-                class_part = "kbd:["
-                self._attrspans.append("]")
-            else:
+            if s != 'keycap':
                 return super().attr_span_begin(token, tokens, i)
+            class_part = "kbd:["
+            self._attrspans.append("]")
         else:
             self._attrspans.append("")
         return id_part + class_part

@@ -49,14 +49,14 @@ def main() -> None:
         for line in config.splitlines()
         if not line.startswith("#") and len(columns := line.split()) > 0
     ]
-    expected_supported_formats = set(
+    expected_supported_formats = {
         prefix
         for (prefix, flags) in formats
         if enable_hashes in flags or enable_hashes == "all"
-    )
-    passthru_supported_schemes = set(
+    }
+    passthru_supported_schemes = {
         f"${scheme}$" for scheme in enabled_crypt_scheme_ids
-    )
+    }
 
     assert (
         len(expected_supported_formats - passthru_supported_schemes) == 0

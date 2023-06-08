@@ -159,7 +159,10 @@ async def updater(nixpkgs_root: str, temp_dir: Optional[Tuple[str, str]], merge_
             # A sentinel received, we are done.
             return
 
-        if not ('commit' in package['supportedFeatures'] or 'attrPath' in package):
+        if (
+            'commit' not in package['supportedFeatures']
+            and 'attrPath' not in package
+        ):
             temp_dir = None
 
         await run_update_script(nixpkgs_root, merge_lock, temp_dir, package, keep_going)
@@ -178,7 +181,7 @@ async def start_updates(max_workers: int, keep_going: bool, commit: bool, packag
         nixpkgs_root = (await nixpkgs_root_process.stdout.read()).decode('utf-8').strip()
 
         # Set up temporary directories when using auto-commit.
-        for i in range(num_workers):
+        for _ in range(num_workers):
             temp_dir = stack.enter_context(make_worktree()) if commit else None
             temp_dirs.append(temp_dir)
 
@@ -188,7 +191,7 @@ async def start_updates(max_workers: int, keep_going: bool, commit: bool, packag
 
         # Add sentinels, one for each worker.
         # A workers will terminate when it gets sentinel from the queue.
-        for i in range(num_workers):
+        for _ in range(num_workers):
             await packages_to_update.put(None)
 
         # Prepare updater workers for each temp_dir directory.

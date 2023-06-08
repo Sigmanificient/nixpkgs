@@ -19,14 +19,18 @@ class LibTransformer(ast.NodeTransformer):
     def visit_If(self, node):
         if ast.unparse(node).startswith("if sys.platform.startswith('linux')"):
             return ast.parse(
-                dedent(
-                    """
+                (
+                    dedent(
+                        """
             free = CDLL(%s).free
             free.argtypes = [c_void_p]
             free.restype = None
             """
+                    )
+                    % (lambda x: f"'{x}'" if x else None)(
+                        os.environ.get("GEOS_LIBC")
+                    )
                 )
-                % (lambda x: "'" + x + "'" if x else None)(os.environ.get("GEOS_LIBC"))
             )
         return node
 
@@ -38,7 +42,7 @@ class LibTransformer(ast.NodeTransformer):
             and _target.id == "_lgeos"
         ):
             self._lgeos_replaced = True
-            return ast.parse("_lgeos = CDLL('%s')" % os.environ["GEOS_LIBRARY_PATH"])
+            return ast.parse(f"""_lgeos = CDLL('{os.environ["GEOS_LIBRARY_PATH"]}')""")
         return node
 
 

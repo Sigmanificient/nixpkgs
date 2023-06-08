@@ -87,7 +87,7 @@ class Driver:
 
     def subtest(self, name: str) -> Iterator[None]:
         """Group logs under a given test name"""
-        with rootlog.nested("subtest: " + name):
+        with rootlog.nested(f"subtest: {name}"):
             try:
                 yield
                 return True
@@ -134,7 +134,7 @@ class Driver:
             + ",\n    "
             + ", ".join(list(general_symbols.keys()))
         )
-        return {**general_symbols, **machine_symbols, **vlan_symbols}
+        return general_symbols | machine_symbols | vlan_symbols
 
     def test_script(self) -> None:
         """Run the test script"""
@@ -229,7 +229,4 @@ class Driver:
                 with rootlog.nested(f"waiting for {self.condition.description}"):
                     retry(condition, timeout=timeout)
 
-        if fun_ is None:
-            return Poll
-        else:
-            return Poll(fun_)
+        return Poll if fun_ is None else Poll(fun_)

@@ -92,7 +92,7 @@ def generate_our_versions(factorio_versions: FactorioVersionsJSON) -> OurVersion
         for release_type in RELEASE_TYPES:
             for release_channel in RELEASE_CHANNELS:
                 version = factorio_versions[release_channel.name].get(release_type.name)
-                if version == None:
+                if version is None:
                     continue
                 this_release = {
                     "name":         f"factorio_{release_type.name}_{system.tar_name}-{version}.tar.xz",
@@ -126,14 +126,18 @@ def merge_versions(old: OurVersionJSON, new: OurVersionJSON) -> OurVersionJSON:
         if FLAGS.release_channel and release_channel_name not in FLAGS.release_channel:
             logging.info("%s/%s/%s: not in --release_channel, not updating", system_name, release_type_name, release_channel_name)
             return old_release
-        if not "sha256" in old_release:
+        if "sha256" not in old_release:
             logging.info("%s/%s/%s: not copying sha256 since it's missing", system_name, release_type_name, release_channel_name)
             return release
-        if not all(old_release.get(k, None) == release[k] for k in ['name', 'version', 'url']):
+        if any(
+            old_release.get(k, None) != release[k]
+            for k in ['name', 'version', 'url']
+        ):
             logging.info("%s/%s/%s: not copying sha256 due to mismatch", system_name, release_type_name, release_channel_name)
             return release
         release["sha256"] = old_release["sha256"]
         return release
+
     return iter_version(new, _merge_version)
 
 
@@ -159,11 +163,14 @@ def fill_in_hash(versions: OurVersionJSON) -> OurVersionJSON:
         logging.info("%s/%s/%s: fetching %s", system_name, release_type_name, release_channel_name, url)
         if release["needsAuth"]:
             if not FLAGS.username or not FLAGS.token:
-                raise Exception("fetching %s/%s/%s from %s requires --username and --token" % (system_name, release_type_name, release_channel_name, url))
+                raise Exception(
+                    f"fetching {system_name}/{release_type_name}/{release_channel_name} from {url} requires --username and --token"
+                )
             url += f"?username={FLAGS.username}&token={FLAGS.token}"
         release["sha256"] = nix_prefetch_url(release["name"], url)
         urls_to_hash[url] = release["sha256"]
         return release
+
     return iter_version(versions, _fill_in_hash)
 
 

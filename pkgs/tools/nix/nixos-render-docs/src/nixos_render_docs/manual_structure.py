@@ -44,16 +44,18 @@ def _check_part_structure(tokens: Sequence[Token]) -> None:
 # the two includes).
 def _check_fragment_structure(tokens: Sequence[Token]) -> None:
     for i, token in enumerate(tokens):
-        if is_include(token) \
-           and i + 1 < len(tokens) \
-           and not (is_include(tokens[i + 1]) or tokens[i + 1].type == 'heading_open'):
+        if (
+            is_include(token)
+            and i + 1 < len(tokens)
+            and not is_include(tokens[i + 1])
+            and tokens[i + 1].type != 'heading_open'
+        ):
             assert token.map
             raise RuntimeError(f"unexpected content in line {token.map[0] + 1}, "
                                "expected heading or structural include")
 
 def check_structure(kind: TocEntryType, tokens: Sequence[Token]) -> None:
-    wanted = { 'h1': 'title' }
-    wanted |= { 'h2': 'subtitle' } if kind == 'book' else {}
+    wanted = { 'h1': 'title' } | ({ 'h2': 'subtitle' } if kind == 'book' else {})
     for (i, (tag, role)) in enumerate(wanted.items()):
         if len(tokens) < 3 * (i + 1):
             raise RuntimeError(f"missing {role} ({tag}) heading")
@@ -148,7 +150,7 @@ class TocEntry(Freezeable):
         flat = list(flatten_with_parent(entries, None))
         prev = flat[0]
         prev.starts_new_chunk = True
-        paths_seen = set([prev.target.path])
+        paths_seen = {prev.target.path}
         for c in flat[1:]:
             if prev.target.path != c.target.path and c.target.path not in paths_seen:
                 c.starts_new_chunk = True

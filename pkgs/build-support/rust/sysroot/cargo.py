@@ -2,7 +2,7 @@ import os
 import toml
 
 rust_src = os.environ['RUSTC_SRC']
-orig_cargo = os.environ['ORIG_CARGO'] if 'ORIG_CARGO' in os.environ else None
+orig_cargo = os.environ.get('ORIG_CARGO', None)
 
 base = {
   'package': {

@@ -21,17 +21,17 @@ Option = collections.namedtuple('Option', ['name', 'value'])
 
 # pivot a dict of options keyed by their display name to a dict keyed by their path
 def pivot(options: Dict[str, JSON]) -> Dict[Key, Option]:
-    result: Dict[Key, Option] = dict()
-    for (name, opt) in options.items():
-        result[Key(opt['loc'])] = Option(name, opt)
+    result: Dict[Key, Option] = {
+        Key(opt['loc']): Option(name, opt) for name, opt in options.items()
+    }
     return result
 
 # pivot back to indexed-by-full-name
 # like the docbook build we'll just fail if multiple options with differing locs
 # render to the same option name.
 def unpivot(options: Dict[Key, Option]) -> Dict[str, JSON]:
-    result: Dict[str, Dict] = dict()
-    for (key, opt) in options.items():
+    result: Dict[str, Dict] = {}
+    for opt in options.values():
         if opt.name in result:
             raise RuntimeError(
                 'multiple options with colliding ids found',
@@ -47,16 +47,16 @@ warnOnDocbook = False
 errorOnDocbook = False
 optOffset = 0
 for arg in sys.argv[1:]:
-    if arg == "--warnings-are-errors":
-        optOffset += 1
-        warningsAreErrors = True
-    if arg == "--warn-on-docbook":
-        optOffset += 1
-        warnOnDocbook = True
-    elif arg == "--error-on-docbook":
+    if arg == "--error-on-docbook":
         optOffset += 1
         errorOnDocbook = True
 
+    elif arg == "--warn-on-docbook":
+        optOffset += 1
+        warnOnDocbook = True
+    elif arg == "--warnings-are-errors":
+        optOffset += 1
+        warningsAreErrors = True
 options = pivot(json.load(open(sys.argv[1 + optOffset], 'r')))
 overrides = pivot(json.load(open(sys.argv[2 + optOffset], 'r')))
 

@@ -12,8 +12,7 @@ from debian.debian_support import Version
 
 def packages():
     packages_url = 'https://packages.microsoft.com/repos/edge/dists/stable/main/binary-amd64/Packages'
-    handle = request.urlopen(packages_url)
-    return handle
+    return request.urlopen(packages_url)
 
 
 def latest_packages(packages: bytes):

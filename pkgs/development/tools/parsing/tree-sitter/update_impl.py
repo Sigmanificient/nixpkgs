@@ -6,7 +6,7 @@ import sys
 from typing import Iterator, Any, Literal, TypedDict, Optional
 from tempfile import NamedTemporaryFile
 
-debug: bool = True if os.environ.get("DEBUG", False) else False
+debug: bool = bool(os.environ.get("DEBUG", False))
 Bin = str
 args: dict[str, Any] = json.loads(os.environ["ARGS"])
 bins: dict[str, Bin] = args["binaries"]
@@ -151,8 +151,7 @@ def fetchOrgaLatestRepos(orga: str) -> set[str]:
         case list(repos):
             res: list[str] = []
             for repo in repos:
-                name = repo.get("name")
-                if name:
+                if name := repo.get("name"):
                     res.append(name)
             return set(res)
         case _:
@@ -164,9 +163,7 @@ def checkTreeSitterRepos(latest_github_repos: set[str]) -> None:
     known: set[str] = set(args["knownTreeSitterOrgGrammarRepos"])
     ignored: set[str] = set(args["ignoredTreeSitterOrgRepos"])
 
-    unknown = latest_github_repos - (known | ignored)
-
-    if unknown:
+    if unknown := latest_github_repos - (known | ignored):
         sys.exit(f"These repositories are neither known nor ignored:\n{unknown}")
 
 

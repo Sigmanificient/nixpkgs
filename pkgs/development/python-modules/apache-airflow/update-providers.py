@@ -31,10 +31,10 @@ EXTRA_REQS = {
 
 
 def get_version():
-    with open(os.path.dirname(sys.argv[0]) + "/default.nix") as fh:
+    with open(f"{os.path.dirname(sys.argv[0])}/default.nix") as fh:
         # A version consists of digits, dots, and possibly a "b" (for beta)
         m = re.search('version = "([\\d\\.b]+)";', fh.read())
-        return m.group(1)
+        return m[1]
 
 
 def get_file_from_github(version: str, path: str):
@@ -89,15 +89,14 @@ def name_to_attr_path(req: str, packages: Dict[str, Dict[str, str]]) -> Optional
         pattern = re.compile(
             f"^python\\d+\\.\\d+-{name}-(?:\\d|unstable-.*)", re.I
         )
-        for attr_path, package in packages.items():
-            # logging.debug("Checking match for %s with %s", name, package["name"])
-            if pattern.match(package["name"]):
-                attr_paths.append(attr_path)
+        attr_paths.extend(
+            attr_path
+            for attr_path, package in packages.items()
+            if pattern.match(package["name"])
+        )
     # Let's hope there's only one derivation with a matching name
     assert len(attr_paths) <= 1, f"{req} matches more than one derivation: {attr_paths}"
-    if attr_paths:
-        return attr_paths[0]
-    return None
+    return attr_paths[0] if attr_paths else None
 
 
 def provider_reqs_to_attr_paths(reqs: List, packages: Dict) -> List:
@@ -110,7 +109,7 @@ def provider_reqs_to_attr_paths(reqs: List, packages: Dict) -> List:
         attr_path = name_to_attr_path(req, packages)
         if attr_path is not None:
             # Add attribute path without "python3Packages." prefix
-            pname = attr_path[len(PKG_SET + ".") :]
+            pname = attr_path[len(f"{PKG_SET}."):]
             attr_paths.append(pname)
         else:
             # If we can't find it, we just skip and warn the user
@@ -152,13 +151,12 @@ def get_provider_reqs(version: str, packages: Dict) -> Dict:
         cross_provider_deps[provider] = [
             d for d in provider_data["cross-providers-deps"] if d != "common.sql"
         ]
-    transitive_provider_reqs = {}
-    # Add transitive cross-provider reqs
-    for provider in provider_reqs:
-        transitive_provider_reqs[provider] = get_cross_provider_reqs(
+    return {
+        provider: get_cross_provider_reqs(
             provider, provider_reqs, cross_provider_deps
         )
-    return transitive_provider_reqs
+        for provider in provider_reqs
+    }
 
 
 def get_provider_yaml(version: str, provider: str) -> Dict:

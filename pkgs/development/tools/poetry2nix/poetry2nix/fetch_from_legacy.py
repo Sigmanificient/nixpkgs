@@ -41,7 +41,7 @@ class Pep503(HTMLParser):
 
 url = sys.argv[1]
 package_name = sys.argv[2]
-index_url = url + "/" + package_name + "/"
+index_url = f"{url}/{package_name}/"
 package_filename = sys.argv[3]
 
 # Parse username and password for this host from the netrc file if given.
@@ -54,7 +54,7 @@ if os.environ["NETRC"]:
         host = host.split(":")[0]
     username, _, password = netrc_obj.authenticators(host)
 
-print("Reading index %s" % index_url)
+print(f"Reading index {index_url}")
 
 context = ssl.create_default_context()
 context.check_hostname = False
@@ -73,16 +73,14 @@ if username and password:
     password_b64 = base64.b64encode(":".join((username, password)).encode()).decode(
         "utf-8"
     )
-    req.add_header("Authorization", "Basic {}".format(password_b64))
+    req.add_header("Authorization", f"Basic {password_b64}")
 response = urllib.request.urlopen(req, context=context)
 index = response.read()
 
 parser = Pep503()
 parser.feed(str(index))
 if package_filename not in parser.sources:
-    print(
-        "The file %s has not be found in the index %s" % (package_filename, index_url)
-    )
+    print(f"The file {package_filename} has not be found in the index {index_url}")
     exit(1)
 
 package_file = open(package_filename, "wb")
@@ -96,7 +94,7 @@ if indicated_url.netloc == "":
         path = parser.sources[package_filename]
     else:
         # A relative path.
-        path = parsed_url.path + "/" + parser.sources[package_filename]
+        path = f"{parsed_url.path}/{parser.sources[package_filename]}"
 
     package_url = urlunparse(
         (
@@ -123,11 +121,11 @@ real_package_url = urlunparse(
         parsed_url.fragment,
     )
 )
-print("Downloading %s" % real_package_url)
+print(f"Downloading {real_package_url}")
 
 req = urllib.request.Request(real_package_url)
 if username and password:
-    req.add_unredirected_header("Authorization", "Basic {}".format(password_b64))
+    req.add_unredirected_header("Authorization", f"Basic {password_b64}")
 response = urllib.request.urlopen(req, context=context)
 
 with response as r:

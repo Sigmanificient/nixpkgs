@@ -50,19 +50,16 @@ def get_maintainers(attr_name):
        return []
 
 def filter_github_users(maintainers):
-    github_only = []
-    for i in maintainers:
-        if i.get('github'):
-            github_only.append(i)
-    return github_only
+    return [i for i in maintainers if i.get('github')]
 
 def print_build(table_row):
     a = pq(table_row)('a')[1]
-    print("- [ ] [{}]({})".format(a.text, a.get('href')), flush=True)
+    print(f"- [ ] [{a.text}]({a.get('href')})", flush=True)
 
-    job_maintainers = filter_github_users(get_maintainers(a.text))
-    if job_maintainers:
-        print("  - maintainers: {}".format(" ".join(map(lambda u: '@' + u.get('github'), job_maintainers))))
+    if job_maintainers := filter_github_users(get_maintainers(a.text)):
+        print(
+            f"""  - maintainers: {" ".join(map(lambda u: '@' + u.get('github'), job_maintainers))}"""
+        )
     # TODO: print last three persons that touched this file
     # TODO: pinpoint the diff that broke this build, or maybe it's transient or maybe it never worked?
 
@@ -79,19 +76,17 @@ def cli(jobset):
     and print a summary of failed builds
     """
 
-    url = "https://hydra.nixos.org/jobset/{}".format(jobset)
+    url = f"https://hydra.nixos.org/jobset/{jobset}"
 
     # get the last evaluation
-    click.echo(click.style(
-        'Getting latest evaluation for {}'.format(url), fg='green'))
+    click.echo(click.style(f'Getting latest evaluation for {url}', fg='green'))
     d = get_response_text(url)
     evaluations = d('#tabs-evaluations').find('a[class="row-link"]')
     latest_eval_url = evaluations[0].get('href')
 
     # parse last evaluation page
-    click.echo(click.style(
-        'Parsing evaluation {}'.format(latest_eval_url), fg='green'))
-    d = get_response_text(latest_eval_url + '?full=1')
+    click.echo(click.style(f'Parsing evaluation {latest_eval_url}', fg='green'))
+    d = get_response_text(f'{latest_eval_url}?full=1')
 
     # TODO: aborted evaluations
     # TODO: dependency failed without propagated builds

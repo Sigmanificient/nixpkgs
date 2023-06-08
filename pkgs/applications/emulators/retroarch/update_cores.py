@@ -124,8 +124,7 @@ def get_repo_hash_fetchFromGitHub(
     else:
         extra_args.append("--no-leave-dot-git")
     if rev:
-        extra_args.append("--rev")
-        extra_args.append(rev)
+        extra_args.extend(("--rev", rev))
     result = subprocess.run(
         ["nix-prefetch-github", owner, repo, *extra_args],
         check=True,
@@ -169,11 +168,7 @@ def main():
     # If you don't want to update all cores, pass the name of the cores you
     # want to update on the command line. E.g.:
     # $ ./update.py citra snes9x
-    if len(sys.argv) > 1:
-        cores_to_update = sys.argv[1:]
-    else:
-        cores_to_update = CORES.keys()
-
+    cores_to_update = sys.argv[1:] if len(sys.argv) > 1 else CORES.keys()
     cores = {core: repo for core, repo in CORES.items() if core in cores_to_update}
     repo_hashes = get_repo_hashes(cores)
     info(f"Generating '{HASHES_PATH}'...")

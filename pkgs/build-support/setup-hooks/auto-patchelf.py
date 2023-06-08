@@ -45,8 +45,7 @@ def get_dependencies(elf: ELFFile) -> List[str]:
     # instance of DynamicSection, but that is required to call iter_tags
     for section in elf.iter_sections():
         if isinstance(section, DynamicSection):
-            for tag in section.iter_tags('DT_NEEDED'):
-                dependencies.append(tag.needed)
+            dependencies.extend(tag.needed for tag in section.iter_tags('DT_NEEDED'))
             break # There is only one dynamic section
 
     return dependencies
@@ -101,11 +100,7 @@ def osabi_are_compatible(wanted: str, got: str) -> bool:
     # Similarly here, we should be able to link against a superset of
     # features, so even if the target has another ABI, this should be
     # fine.
-    if got == 'ELFOSABI_SYSV':
-        return True
-
-    # Otherwise, we simply return whether the ABIs are identical.
-    return wanted == got
+    return True if got == 'ELFOSABI_SYSV' else wanted == got
 
 
 def glob(path: Path, pattern: str, recursive: bool) -> Iterator[Path]:
@@ -154,10 +149,14 @@ def populate_cache(initial: List[Path], recursive: bool =False) -> None:
 
 
 def find_dependency(soname: str, soarch: str, soabi: str) -> Optional[Path]:
-    for lib, libabi in soname_cache[(soname, soarch)]:
-        if osabi_are_compatible(soabi, libabi):
-            return lib
-    return None
+    return next(
+        (
+            lib
+            for lib, libabi in soname_cache[(soname, soarch)]
+            if osabi_are_compatible(soabi, libabi)
+        ),
+        None,
+    )
 
 
 @dataclass

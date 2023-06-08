@@ -65,17 +65,13 @@ class WordIndex:
 
    @classmethod
    def build_from_file(cls, f, synset_map, rv_base=None):
-      if (rv_base is None):
-         rv = {}
-      else:
-         rv = rv_base
-
+      rv = {} if (rv_base is None) else rv_base
       for line in f:
          if (line.startswith('  ')):
             continue
          wi = cls.build_from_line(line, synset_map)
          word = wi.lemma.lower()
-         if not (word in rv):
+         if word not in rv:
             rv[word] = []
          rv[word].append(wi)
       return rv
@@ -104,13 +100,11 @@ class WordIndexDictFormatter(WordIndex):
          subsequent_indent=self.prefix_fmtn_line_first)
 
       lines = (tw.wrap(self.synsets[0].dict_str()))
-      i = 2
-      for synset in self.synsets[1:]:
+      for i, synset in enumerate(self.synsets[1:], start=2):
          tw = TextWrapper(width=self.LINE_WIDTH_MAX,
             initial_indent=(self.prefix_fmtf_line_nonfirst % i),
             subsequent_indent=self.prefix_fmtn_line_nonfirst)
          lines.extend(tw.wrap(synset.dict_str()))
-         i += 1
       return self.linesep.join(lines)
 
 
@@ -144,11 +138,7 @@ class Synset:
          frames = []
 
       line_split2 = line_data.split(None, base)
-      if (len(line_split2) < base):
-         gloss = None
-      else:
-         gloss = line_split2[-1]
-
+      gloss = None if (len(line_split2) < base) else line_split2[-1]
       return cls(synset_offset, ss_type, words, ptrs, gloss, frames)
 
    @classmethod
@@ -263,8 +253,7 @@ original version.\n\n
       self.dict_entry_write(file_index, file_data, '00-database-url', '00-database-url\n%s\n' % self.wn_url)
 
 
-      words = list(self.word_data.keys())
-      words.sort()
+      words = sorted(self.word_data.keys())
       for word in words:
          for wi in self.word_data[word]:
             word_cs = word
@@ -286,7 +275,7 @@ original version.\n\n
          for wi in self.word_data[word]:
             outstr += wi.dict_str() + '\n'
 
-         outstr = '%s%s%s' % (word_cs, wi.linesep, outstr)
+         outstr = f'{word_cs}{wi.linesep}{outstr}'
          self.dict_entry_write(file_index, file_data, word_cs, outstr, wi.linesep)
 
       file_index.truncate()

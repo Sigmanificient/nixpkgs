@@ -29,7 +29,7 @@ for line in open(f"{src}/cmake.deps/CMakeLists.txt"):
     ty = m[2]
     val = m[3]
 
-    if not lang in parsers:
+    if lang not in parsers:
         parsers[lang] = {}
     parsers[lang][ty] = val
 
