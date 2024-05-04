@@ -9,20 +9,20 @@
 
 let
   pname = "spacedrive";
-  version = "0.2.4";
+  version = "0.2.13";
 
   src = fetchurl {
     aarch64-darwin = {
       url = "https://github.com/spacedriveapp/spacedrive/releases/download/${version}/Spacedrive-darwin-aarch64.dmg";
-      hash = "sha256-rVRmlhsvvFFRr3ghX0cvfcJO3WlbaNNBo+r4I556YEg=";
+      hash = "sha256-Ph9+Jve1qP1KBbKRN1I2lylHRy/SWRJAx7nOF9l3A/E=";
     };
     x86_64-darwin = {
       url = "https://github.com/spacedriveapp/spacedrive/releases/download/${version}/Spacedrive-darwin-x86_64.dmg";
-      hash = "sha256-etRAcGC5S0GwVrBWICfB5ef83xcp/35K0/QndKmPUSE=";
+      hash = "sha256-+FHxJre+ouOxKvhDG+uDKDp7ZSx8NWRxac4m4yFqgrE=";
     };
     x86_64-linux = {
       url = "https://github.com/spacedriveapp/spacedrive/releases/download/${version}/Spacedrive-linux-x86_64.AppImage";
-      hash = "sha256-D8etNXrDVLHa1wg+7Xu9yXUvhlAXxMVBM3GpOerFsu0=";
+      hash = "sha256-AyR1FshOjFatkZLgT2K46IKJgeFDu4e4//CvcuNyt0E=";
     };
   }.${stdenv.system} or (throw "${pname}-${version}: ${stdenv.system} is unsupported.");
 
@@ -65,9 +65,6 @@ else appimageTools.wrapType2 {
       appimageContents = appimageTools.extractType2 { inherit pname version src; };
     in
     ''
-      # Remove version from entrypoint
-      mv $out/bin/spacedrive-${version} $out/bin/spacedrive
-
       # Install .desktop files
       install -Dm444 ${appimageContents}/com.spacedrive.desktop -t $out/share/applications
       install -Dm444 ${appimageContents}/spacedrive.png -t $out/share/pixmaps

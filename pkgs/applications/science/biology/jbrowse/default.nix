@@ -1,4 +1,4 @@
-{ lib, fetchurl, appimageTools, wrapGAppsHook }:
+{ lib, fetchurl, appimageTools, wrapGAppsHook3 }:
 
 let
   pname = "jbrowse";
@@ -19,9 +19,7 @@ appimageTools.wrapType2 {
   unshareIpc = false;
 
   extraInstallCommands = ''
-    mkdir -p $out/bin
-    mv $out/bin/jbrowse-${version} $out/bin/jbrowse-desktop
-
+    mv $out/bin/jbrowse $out/bin/jbrowse-desktop
     install -m 444 -D ${appimageContents}/jbrowse-desktop.desktop $out/share/applications/jbrowse-desktop.desktop
     install -m 444 -D ${appimageContents}/jbrowse-desktop.png \
        $out/share/icons/hicolor/512x512/apps/jbrowse-desktop.png

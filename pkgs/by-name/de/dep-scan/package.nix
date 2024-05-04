@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "dep-scan";
-  version = "5.3.2";
+  version = "5.3.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "owasp-dep-scan";
     repo = "dep-scan";
     rev = "refs/tags/v${version}";
-    hash = "sha256-2WV4f9vHdfnzoQWvwK/+lT9IS0v0sGBqnwDFHWG48G4=";
+    hash = "sha256-5iMhl3Wcxwgq4Wr0TUcAuRnb2+y8DHBugnnkpcZfSAM=";
   };
 
   postPatch = ''

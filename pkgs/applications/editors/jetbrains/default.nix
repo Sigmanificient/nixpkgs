@@ -100,10 +100,12 @@ rec {
   clion = (mkJetBrainsProduct {
     pname = "clion";
     extraBuildInputs = lib.optionals (stdenv.isLinux) [
+      fontconfig
       python3
       stdenv.cc.cc
       openssl
       libxcrypt-legacy
+      lttng-ust_2_12
       musl
     ] ++ lib.optionals (stdenv.isLinux && stdenv.isAarch64) [
       expat
@@ -111,6 +113,17 @@ rec {
       xz
     ];
   }).overrideAttrs (attrs: {
+    postInstall = (attrs.postInstall or "") + lib.optionalString (stdenv.isLinux) ''
+      (
+        cd $out/clion
+
+        for dir in plugins/clion-radler/DotFiles/linux-*; do
+          rm -rf $dir/dotnet
+          ln -s ${dotnet-sdk_7} $dir/dotnet
+        done
+      )
+    '';
+
     postFixup = (attrs.postFixup or "") + lib.optionalString (stdenv.isLinux) ''
       (
         cd $out/clion
@@ -254,6 +267,8 @@ rec {
   });
 
   webstorm = mkJetBrainsProduct { pname = "webstorm"; extraBuildInputs = [ stdenv.cc.cc musl ]; };
+
+  writerside = mkJetBrainsProduct { pname = "writerside"; extraBuildInputs = [ stdenv.cc.cc musl ]; };
 
   plugins = callPackage ./plugins { } // { __attrsFailEvaluation = true; };
 

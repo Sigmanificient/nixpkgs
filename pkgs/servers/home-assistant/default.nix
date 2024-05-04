@@ -262,7 +262,7 @@ let
         };
 
         nativeBuildInputs = with self; [
-          cython_3
+          cython
           setuptools
           libxml2.dev
           libxslt.dev
@@ -388,6 +388,13 @@ let
           rev = "refs/tags/${version}";
           hash = "sha256-vi5f4V0nPb9K3nwdmwMDoNE85Or6haOWjMY4d/2Fj2s=";
         };
+        dependencies = with self; [
+          aiohttp
+          async-timeout
+          gql
+          python-dateutil
+          websockets
+        ];
       });
 
       pykaleidescape = super.pykaleidescape.overridePythonAttrs (oldAttrs: rec {
@@ -439,17 +446,9 @@ let
         };
       });
 
-      versioningit = super.versioningit.overridePythonAttrs (oldAttrs: rec {
-        version = "2.2.0";
-        src = fetchPypi {
-          inherit (oldAttrs) pname;
-          inherit version;
-          hash = "sha256-6xjnunJoqIC/HM/pLlNOlqs04Dl/KNy8s/wNpPaltr0=";
-        };
-        pytestFlagsArray = [
-          "-W" "ignore::DeprecationWarning"
-        ];
-      });
+      versioningit = super.versioningit.overridePythonAttrs {
+        doCheck = false;
+      };
 
       voluptuous = super.voluptuous.overridePythonAttrs (oldAttrs: rec {
         version = "0.13.1";
@@ -525,8 +524,8 @@ let
   # Ensure that we are using a consistent package set
   extraBuildInputs = extraPackages python.pkgs;
 
-  # Don't forget to run parse-requirements.py after updating
-  hassVersion = "2024.4.2";
+  # Don't forget to run update-component-packages.py after updating
+  hassVersion = "2024.4.4";
 
 in python.pkgs.buildPythonApplication rec {
   pname = "homeassistant";
@@ -544,13 +543,13 @@ in python.pkgs.buildPythonApplication rec {
     owner = "home-assistant";
     repo = "core";
     rev = "refs/tags/${version}";
-    hash = "sha256-V6qvpPrhfSLINH99hYkAjvG8pfIN8AXGO3HuwiKgMPo=";
+    hash = "sha256-bZcrFtaO0S22M6Wt2otK8rCg+NhpXr+/yRFxi02QJJI=";
   };
 
   # Secondary source is pypi sdist for translations
   sdist = fetchPypi {
     inherit pname version;
-    hash = "sha256-ZtTlLRDSXKUz+ZA+UctFL+d3wdKrcPdeROIUhS35qWU=";
+    hash = "sha256-NyIBFpDstX1MEoLS9p7GXl/+V6xB2hklNf2LmNLUMQk=";
   };
 
   nativeBuildInputs = with python.pkgs; [
@@ -559,6 +558,7 @@ in python.pkgs.buildPythonApplication rec {
   ];
 
   pythonRelaxDeps = [
+    "aiohttp"
     "attrs"
     "bcrypt"
     "ciso8601"
@@ -566,6 +566,7 @@ in python.pkgs.buildPythonApplication rec {
     "hass-nabucasa"
     "httpx"
     "orjson"
+    "pillow"
     "pyopenssl"
     "typing-extensions"
     "urllib3"

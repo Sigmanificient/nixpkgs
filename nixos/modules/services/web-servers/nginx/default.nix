@@ -164,7 +164,7 @@ let
       ${commonHttpConfig}
 
       ${optionalString (cfg.resolver.addresses != []) ''
-        resolver ${toString cfg.resolver.addresses} ${optionalString (cfg.resolver.valid != "") "valid=${cfg.resolver.valid}"} ${optionalString (!cfg.resolver.ipv6) "ipv6=off"};
+        resolver ${toString cfg.resolver.addresses} ${optionalString (cfg.resolver.valid != "") "valid=${cfg.resolver.valid}"} ${optionalString (!cfg.resolver.ipv4) "ipv4=off"} ${optionalString (!cfg.resolver.ipv6) "ipv6=off"};
       ''}
       ${upstreamConfig}
 
@@ -352,7 +352,8 @@ let
 
         # The acme-challenge location doesn't need to be added if we are not using any automated
         # certificate provisioning and can also be omitted when we use a certificate obtained via a DNS-01 challenge
-        acmeLocation = optionalString (vhost.enableACME || (vhost.useACMEHost != null && config.security.acme.certs.${vhost.useACMEHost}.dnsProvider == null))
+        acmeName = if vhost.useACMEHost != null then vhost.useACMEHost else vhostName;
+        acmeLocation = optionalString ((vhost.enableACME || vhost.useACMEHost != null) && config.security.acme.certs.${acmeName}.dnsProvider == null)
           # Rule for legitimate ACME Challenge requests (like /.well-known/acme-challenge/xxxxxxxxx)
           # We use ^~ here, so that we don't check any regexes (which could
           # otherwise easily override this intended match accidentally).
@@ -829,7 +830,7 @@ in
       sslCiphers = mkOption {
         type = types.nullOr types.str;
         # Keep in sync with https://ssl-config.mozilla.org/#server=nginx&config=intermediate
-        default = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+        default = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305";
         description = "Ciphers to choose from when negotiating TLS handshakes.";
       };
 
@@ -976,6 +977,15 @@ in
               description = ''
                 By default, nginx caches answers using the TTL value of a response.
                 An optional valid parameter allows overriding it
+              '';
+            };
+            ipv4 = mkOption {
+              type = types.bool;
+              default = true;
+              description = ''
+                By default, nginx will look up both IPv4 and IPv6 addresses while resolving.
+                If looking up of IPv4 addresses is not desired, the ipv4=off parameter can be
+                specified.
               '';
             };
             ipv6 = mkOption {
@@ -1177,6 +1187,13 @@ in
         message = ''
           services.nginx.virtualHosts.<name>.enableACME requires a HTTP listener
           to answer to ACME requests.
+        '';
+      }
+
+      {
+        assertion = cfg.resolver.ipv4 || cfg.resolver.ipv6;
+        message = ''
+          At least one of services.nginx.resolver.ipv4 and services.nginx.resolver.ipv6 must be true.
         '';
       }
     ] ++ map (name: mkCertOwnershipAssertion {

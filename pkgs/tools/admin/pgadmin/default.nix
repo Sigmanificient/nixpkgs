@@ -7,7 +7,7 @@
 , postgresqlTestHook
 , postgresql
 , yarn
-, prefetch-yarn-deps
+, fixup-yarn-lock
 , nodejs
 , stdenv
 , server-mode ? true
@@ -151,7 +151,7 @@ pythonPackages.buildPythonApplication rec {
     cp -v ../pkg/pip/setup_pip.py setup.py
   '';
 
-  nativeBuildInputs = with pythonPackages; [ cython pip sphinx yarn prefetch-yarn-deps nodejs ];
+  nativeBuildInputs = with pythonPackages; [ cython pip sphinx yarn fixup-yarn-lock nodejs ];
   buildInputs = [
     zlib
     pythonPackages.wheel
@@ -221,6 +221,9 @@ pythonPackages.buildPythonApplication rec {
     pythonPackages.testscenarios
     pythonPackages.selenium
   ];
+
+  # sandboxing issues on aarch64-darwin, see https://github.com/NixOS/nixpkgs/issues/198495
+  doCheck = postgresql.doCheck;
 
   checkPhase = ''
     runHook preCheck

@@ -2,13 +2,13 @@
 
 buildGoModule rec {
   pname = "argocd";
-  version = "2.10.6";
+  version = "2.10.8";
 
   src = fetchFromGitHub {
     owner = "argoproj";
     repo = "argo-cd";
     rev = "v${version}";
-    hash = "sha256-tKZQVI2WiqsPIMHCBGJHcZYk4gOoshiGA0WPyeoxvok=";
+    hash = "sha256-VzEgZshzIHXI0J172W1zI1E8dU8iYJq0lO01LpI8Y+U=";
   };
 
   proxyVendor = true; # darwin/linux hash mismatch
