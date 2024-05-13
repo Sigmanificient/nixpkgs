@@ -22419,8 +22419,6 @@ with pkgs;
 
   libmypaint = callPackage ../development/libraries/libmypaint { };
 
-  libmysofa = callPackage ../development/libraries/audio/libmysofa { };
-
   libmysqlconnectorcpp = callPackage ../development/libraries/libmysqlconnectorcpp { };
 
   libnatpmp = callPackage ../development/libraries/libnatpmp { };
