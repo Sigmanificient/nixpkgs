@@ -118,7 +118,7 @@ python3.pkgs.buildPythonApplication rec {
     ''test cases/osx/7 bitcode''
   ])
   ++ [
-    ''HOME="$TMPDIR" python ./run_project_tests.py''
+    ''HOME="$TMPDIR" ${python3.executable} ./run_project_tests.py''
     "runHook postCheck"
   ]);
 
