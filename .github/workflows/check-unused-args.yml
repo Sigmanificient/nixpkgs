@@ -1,0 +1,35 @@
+name: Check for uneeded arguments
+
+on:
+  pull_request_target:
+
+permissions:
+  contents: read
+
+jobs:
+  nixos:
+    runs-on: ubuntu-latest
+    # if: github.repository_owner == 'NixOS'
+
+    steps:
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        # pull_request_target checks out the base branch by default
+        ref: refs/pull/${{ github.event.pull_request.number }}/merge
+
+    - uses: cachix/install-nix-action@8887e596b4ee1134dae06b98d573bd674693f47c # v26
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+
+    - name: Get changed files
+      id: changed-files
+      uses: karpikpl/list-changed-files-action@1.1.2
+      with:
+        file-filter: '*.nix'
+
+    - name: Run deadnix
+      env:
+        ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      run: |
+        nix-shell -p deadnix \
+          --run "deadnix -o json"
