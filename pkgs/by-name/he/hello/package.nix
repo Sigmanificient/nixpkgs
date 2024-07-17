@@ -3,6 +3,7 @@
 , stdenv
 , fetchurl
 , nixos
+, fetchpatch
 , testers
 , versionCheckHook
 , hello
