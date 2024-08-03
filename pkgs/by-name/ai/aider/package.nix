@@ -4,6 +4,9 @@
   fetchFromGitHub,
   git,
   portaudio,
+  withHelp ? true,
+  withBrowser ? true,
+  withPlayright ? true
 }:
 
 # pinned to python311Packages to to tree-sitter
@@ -22,7 +25,7 @@ python311Packages.buildPythonApplication rec {
 
   build-system = with python311Packages; [ setuptools ];
 
-  dependencies = with python311Packages; [
+  dependencies = with python311Packages; ([
     aiohttp
     aiosignal
     annotated-types
@@ -96,7 +99,18 @@ python311Packages.buildPythonApplication rec {
     wcwidth
     yarl
     zipp
-  ] ++ [ portaudio ];
+  ] ++ (lib.optionals withHelp [
+    # see requirements/requirements-help.in
+    llama-index-core
+    llama-index-embeddings-huggingface
+  ]) ++ (lib.optionals withBrowser [
+    # see requirements/requirements-browser.in
+    streamlit
+    watchdog
+  ]) ++ (lib.optionals withPlayright [
+    # see requirements/requirements-playwright.in
+    playwright
+  ])) ++ [ portaudio ];
 
   pythonRelaxDeps = [
     "anyio"
