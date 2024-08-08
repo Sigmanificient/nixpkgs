@@ -474,7 +474,11 @@ stdenv.mkDerivation (rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     make -C docs install
+
+    runHook postInstall
   '';
 } else {
   ninjaFlags = [ "docs-llvm-man" ];

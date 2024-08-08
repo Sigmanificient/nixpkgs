@@ -83,8 +83,12 @@ let
         ${pkg}/bin/${program} ${toString flags} < <(echo '(compile-file "asdf.lisp")')
       '';
       installPhase = ''
+        runHook preInstall
+
         mkdir -p $out
         cp -v asdf.${faslExt} $out
+
+        runHook postInstall
       '';
     };
 
@@ -289,6 +293,8 @@ let
     }).overrideAttrs(o: {
       nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
       installPhase = ''
+        runHook preInstall
+
         mkdir -pv $out/bin
         makeWrapper \
           ${o.pkg}/bin/${o.program} \
@@ -302,6 +308,8 @@ let
           --prefix CLASSPATH : "$CLASSPATH" \
           --prefix GI_TYPELIB_PATH : "$GI_TYPELIB_PATH" \
           --prefix PATH : "${makeBinPath (o.propagatedBuildInputs or [])}"
+
+        runHook postInstall
       '';
     });
 

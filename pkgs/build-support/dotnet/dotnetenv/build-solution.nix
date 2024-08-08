@@ -31,6 +31,8 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     addDeps()
     {
 	if [ -f $1/nix-support/dotnet-assemblies ]
@@ -81,5 +83,7 @@ stdenv.mkDerivation {
     do
         echo $i >> $out/nix-support/dotnet-assemblies
     done
+
+    runHook postInstall
   '';
 }

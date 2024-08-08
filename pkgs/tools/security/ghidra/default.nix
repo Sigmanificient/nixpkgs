@@ -48,6 +48,8 @@ in stdenv.mkDerivation rec {
   dontStrip = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "${pkg_path}"
     mkdir -p "${pkg_path}" "$out/share/applications"
     cp -a * "${pkg_path}"
@@ -60,6 +62,8 @@ in stdenv.mkDerivation rec {
       mkdir -pv "$out/share/icons/hicolor/$res/apps"
       mv "$f" "$out/share/icons/hicolor/$res/apps/ghidra.png"
     done;
+
+    runHook postInstall
   '';
 
   postFixup = ''

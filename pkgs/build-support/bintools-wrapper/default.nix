@@ -176,6 +176,8 @@ stdenvNoCC.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin $out/nix-support
 
       wrap() {
@@ -241,6 +243,8 @@ stdenvNoCC.mkDerivation {
         basename=$(basename "$variant")
         wrap $basename ${./ld-wrapper.sh} $variant
       done
+
+      runHook postInstall
     '';
 
   strictDeps = true;

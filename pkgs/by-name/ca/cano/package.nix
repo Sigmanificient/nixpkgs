@@ -19,8 +19,12 @@ stdenv.mkDerivation (finalAttrs: {
   hardeningDisable = [ "format" "fortify" ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp build/cano $out/bin
+
+    runHook postInstall
   '';
 
   meta = {

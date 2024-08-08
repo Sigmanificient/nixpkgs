@@ -14,6 +14,8 @@ stdenvNoCC.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     for i in rtl8192sfw.bin \
              rtl8192sufw-ap.bin \
              rtl8192sufw-apple.bin \
@@ -25,6 +27,8 @@ stdenvNoCC.mkDerivation {
     do
       install -D -pm644 firmwares/$i $out/lib/firmware/rtlwifi/$i
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -18,9 +18,13 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
     cp -r * $out/
     cp ${localConfig} $out/lib/config.local.php
+
+    runHook postInstall
   '';
 
   meta = with lib; {

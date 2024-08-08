@@ -12,8 +12,12 @@ stdenv.mkDerivation rec {
   buildInputs = [ emacs ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$out/share/emacs/site-lisp"
     cp lisp/*.el "$out/share/emacs/site-lisp/"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -34,6 +34,8 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/usr/share/zapret/init.d/sysv
     mkdir -p $out/usr/share/docs
 
@@ -66,6 +68,8 @@ stdenv.mkDerivation {
     done
 
     ln -s ../usr/share/zapret/init.d/sysv/init.d $out/bin/zapret
+
+    runHook postInstall
   '';
 
   meta = with lib; {

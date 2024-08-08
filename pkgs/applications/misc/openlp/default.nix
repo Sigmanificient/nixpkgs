@@ -70,7 +70,11 @@ in mkDerivation {
       ++ map wrapSetVar [ "URE_BOOTSTRAP" "UNO_PATH" ]);
 
   installPhase = ''
+    runHook preInstall
+
     install -D openlp.py $out/bin/openlp
+
+    runHook postInstall
   '';
 
   preFixup = ''

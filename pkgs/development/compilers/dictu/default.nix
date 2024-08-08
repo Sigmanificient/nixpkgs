@@ -66,12 +66,16 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out
     cp -r /build/source/src/include $out/include
     mkdir -p $out/lib
     cp /build/source/build/src/libdictu_api* $out/lib
   '' + lib.optionalString cliSupport ''
     install -Dm755 /build/source/dictu $out/bin/dictu
+
+    runHook postInstall
   '';
 
   meta = with lib; {

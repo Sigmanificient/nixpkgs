@@ -50,12 +50,16 @@ stdenv.mkDerivation (finalAttrs: {
     ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
     cp -r include lib $out
 
     # Add some compatibility with coin-or-mumps
     ln -s $out/include $out/include/mumps
     cp libseq/mumps_mpi.h $out/include
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [ gfortran ];

@@ -53,7 +53,11 @@ mkYarnPackage rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     cp -r deps/console/dist/console $out
+
+    runHook postInstall
   '';
 
   doDist = false;

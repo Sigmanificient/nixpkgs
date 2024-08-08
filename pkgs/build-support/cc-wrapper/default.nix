@@ -456,9 +456,13 @@ stdenvNoCC.mkDerivation {
       name = "win-dll-hook.sh";
       dontUnpack = true;
       installPhase = ''
+        runHook preInstall
+
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib" > $out
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib64" >> $out
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib32" >> $out
+
+        runHook postInstall
       '';
     });
 

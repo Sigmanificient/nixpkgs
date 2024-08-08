@@ -56,6 +56,8 @@ in buildNpmPackage {
   npmDepsHash = source.depsHash;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/opt/client
     cp -r index.js server package* node_modules $out/opt/
     cp -r ${client}/lib/node_modules/${pname}-client/dist $out/opt/client/dist
@@ -65,6 +67,8 @@ in buildNpmPackage {
     echo "  exec ${nodejs}/bin/node $out/opt/index.js" >> $out/bin/${pname}
 
     chmod +x $out/bin/${pname}
+
+    runHook postInstall
   '';
 
   passthru.updateScript = ./update.nu;

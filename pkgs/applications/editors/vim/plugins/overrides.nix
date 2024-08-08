@@ -592,7 +592,11 @@
       '';
 
       installPhase = ''
+        runHook preInstall
+
         install -D cord $out/lua/cord.${extension}
+
+        runHook postInstall
       '';
 
       doInstallCheck = true;
@@ -1555,7 +1559,11 @@
         ];
         preferLocalBuild = true;
         installPhase = ''
+          runHook preInstall
+
           install -Dt $out/bin ftplugin/evinceSync.py
+
+          runHook postInstall
         '';
       };
       # the vim plugin expects evinceSync.py to be a python file, but it is a C wrapper
@@ -1611,8 +1619,12 @@
           # remove pre-compiled binaries
           preBuild = "rm -rf static/*";
           installPhase = ''
+            runHook preInstall
+
             install -Dm 444 -t $out/static static/*
             install -Dm 444 -t $out/lua lua/*
+
+            runHook postInstall
           '';
         };
       in
