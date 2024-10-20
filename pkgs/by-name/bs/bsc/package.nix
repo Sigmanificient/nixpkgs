@@ -16,6 +16,11 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-reGg5xvoZBbNFFYPPyT2P1LA7oSCUIm9NIDjXyvkP9Q=";
   };
 
+  postPatch = lib.optional (stdenv.isAarch64) ''
+    substituteInPlace \
+      --replace-fail makefile "CFLAGS += -mavx2" "# CFLAGS += -mavx2"
+  '';
+
   enableParallelBuilding = true;
 
   buildInputs = lib.optional stdenv.hostPlatform.isDarwin llvmPackages.openmp;
