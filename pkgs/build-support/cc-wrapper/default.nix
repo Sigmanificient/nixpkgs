@@ -355,6 +355,8 @@ stdenvNoCC.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin $out/nix-support
 
       wrap() {
@@ -457,6 +459,8 @@ stdenvNoCC.mkDerivation {
     + optionalString cc.langGo or false ''
       wrap ${targetPrefix}gccgo $wrapper $ccPath/${targetPrefix}gccgo
       wrap ${targetPrefix}go ${./go-wrapper.sh} $ccPath/${targetPrefix}go
+
+      runHook postInstall
     '';
 
   strictDeps = true;
@@ -471,9 +475,13 @@ stdenvNoCC.mkDerivation {
       name = "win-dll-hook.sh";
       dontUnpack = true;
       installPhase = ''
+        runHook preInstall
+
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib" > $out
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib64" >> $out
         echo addToSearchPath "LINK_DLL_FOLDERS" "${cc_solib}/lib32" >> $out
+
+        runHook postInstall
       '';
     });
 

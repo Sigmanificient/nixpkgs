@@ -24,8 +24,12 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -D ajantv2.ko $out/lib/modules/${kernel.modDirVersion}/misc/ajantv2.ko
     install -D ajardma.ko $out/lib/modules/${kernel.modDirVersion}/misc/ajardma.ko
+
+    runHook postInstall
   '';
 
   meta = {

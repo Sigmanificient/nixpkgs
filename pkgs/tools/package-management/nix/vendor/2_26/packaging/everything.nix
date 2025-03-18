@@ -154,6 +154,8 @@ stdenv.mkDerivation (finalAttrs: {
       devPaths = lib.mapAttrsToList (_k: lib.getDev) finalAttrs.finalPackage.libs;
     in
     ''
+      runHook preInstall
+
       mkdir -p $out $dev/nix-support $doc $man
 
       # Custom files
@@ -170,6 +172,8 @@ stdenv.mkDerivation (finalAttrs: {
       # Forwarded outputs
       ln -s ${nix-manual} $doc
       ln -s ${nix-manual.man} $man
+
+      runHook postInstall
     '';
 
   passthru = {

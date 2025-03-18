@@ -26,8 +26,12 @@ buildNpmPackage rec {
   npmDepsHash = "sha256-+MfqmMZ2fiijr4X2S2TQfo25mVGpnZtZYOxCfPH4gFY=";
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/fluidd
     cp -r dist $out/share/fluidd/htdocs
+
+    runHook postInstall
   '';
 
   passthru.tests = { inherit (nixosTests) fluidd; };

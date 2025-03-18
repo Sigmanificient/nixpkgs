@@ -31,7 +31,11 @@
     echo building nothing
   '';
   installPhase = ''
+    runHook preInstall
+
     echo installing nothing
+
+    runHook postInstall
   '';
 
   meta = {
@@ -45,7 +49,11 @@
     # stdlib is already included in Coq <= 8.20
     if coq.version != null && coq.version != "dev" && lib.versions.isLt "8.21" coq.version then {
       installPhase = ''
+        runHook preInstall
+
         touch $out
+
+        runHook postInstall
       '';
     } else { propagatedBuildInputs = [ rocqPackages.stdlib ]; }
   )

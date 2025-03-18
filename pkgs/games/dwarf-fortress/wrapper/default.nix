@@ -215,6 +215,8 @@ lib.throwIf (enableTWBT' && !enableDFHack) "dwarf-fortress: TWBT requires DFHack
     preferLocalBuild = true;
     installPhase =
       ''
+        runHook preInstall
+
         mkdir -p $out/bin
 
         substitute $runDF $out/bin/dwarf-fortress \
@@ -236,6 +238,8 @@ lib.throwIf (enableTWBT' && !enableDFHack) "dwarf-fortress: TWBT requires DFHack
           --subst-var-by jre ${jdk.jre} \
           --subst-var dfInit
         chmod 755 $out/bin/soundsense
+
+        runHook postInstall
       '';
 
     doInstallCheck = stdenv.hostPlatform.isLinux;

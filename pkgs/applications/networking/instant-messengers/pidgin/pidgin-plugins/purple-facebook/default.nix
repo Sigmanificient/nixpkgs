@@ -58,8 +58,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/lib/purple-2
     cp pidgin/libpurple/protocols/facebook/.libs/*.so $out/lib/purple-2/
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [ autoreconfHook ];

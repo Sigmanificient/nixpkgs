@@ -16,8 +16,12 @@ stdenvNoCC.mkDerivation rec {
   dontUnpack = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/fonts/opentype
     cp $src $out/share/fonts/opentype/nasin-nanpa.otf
+
+    runHook postInstall
   '';
 
   meta = with lib; {

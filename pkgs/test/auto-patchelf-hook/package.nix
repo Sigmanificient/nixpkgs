@@ -46,7 +46,11 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mv usr $out
+
+    runHook postInstall
   '';
 
   buildInputs = [

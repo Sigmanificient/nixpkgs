@@ -19,7 +19,11 @@ stdenv.mkDerivation {
   };
 
   installPhase = ''
+    runHook preInstall
+
     install -m 555 -Dt $out/bin $pname
+
+    runHook postInstall
   '';
 
   postFixup = ''

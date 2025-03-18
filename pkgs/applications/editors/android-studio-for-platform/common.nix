@@ -67,6 +67,8 @@ let
     ];
 
     installPhase = ''
+      runHook preInstall
+
       cp -r "./opt/${pname}/" $out
       wrapProgram $out/bin/studio.sh \
         --set-default JAVA_HOME "$out/jbr" \
@@ -123,6 +125,8 @@ let
             e2fsprogs
           ]
         }"
+
+      runHook postInstall
     '';
   };
 

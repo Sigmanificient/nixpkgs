@@ -27,10 +27,14 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mkdir -p $out/share/rpiboot
     cp rpiboot $out/bin
     cp -r msd firmware eeprom-erase mass-storage-gadget* recovery* secure-boot* rpi-eeprom rpi-imager-embedded $out/share/rpiboot
+
+    runHook postInstall
   '';
 
   passthru.updateScript = gitUpdater { };

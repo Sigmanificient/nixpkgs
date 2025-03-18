@@ -74,6 +74,8 @@ let
       '';
 
       installPhase = ''
+        runHook preInstall
+
         mkdir -p $out
         cp -r * $out/
 
@@ -93,6 +95,8 @@ let
         ${concatMapStringsSep "\n" (
           template: "cp -r ${template}/. $out/application/views/invoice_templates/pdf/"
         ) cfg.invoiceTemplates}
+
+        runHook postInstall
       '';
     };
 

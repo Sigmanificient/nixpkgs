@@ -45,6 +45,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -D -m755 buck-out/gen/*/programs/buck.pex $out/bin/buck
     wrapProgram $out/bin/buck \
       --prefix PATH : "${
@@ -54,6 +56,8 @@ stdenv.mkDerivation rec {
           python3
         ]
       }"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

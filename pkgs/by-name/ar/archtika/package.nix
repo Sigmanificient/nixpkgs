@@ -24,11 +24,15 @@ let
     npmDepsHash = "sha256-RTyo7K/Hr1hBGtcBKynrziUInl91JqZl84NkJg16ufA=";
     npmFlags = [ "--legacy-peer-deps" ];
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/web-app
       cp package.json $out/web-app
       cp -r node_modules $out/web-app
       cp -r build/* $out/web-app
       cp -r template-styles $out/web-app
+
+      runHook postInstall
     '';
   };
 
@@ -36,8 +40,12 @@ let
     name = "api";
     src = "${src}/rest-api";
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/rest-api/db/migrations
       cp -r db/migrations/* $out/rest-api/db/migrations
+
+      runHook postInstall
     '';
   };
 in

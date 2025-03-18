@@ -65,7 +65,11 @@ rustPlatform.buildRustPackage rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     cargo make --profile release install
+
+    runHook postInstall
   '';
 
   meta = with lib; {

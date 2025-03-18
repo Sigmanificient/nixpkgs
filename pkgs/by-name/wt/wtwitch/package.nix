@@ -45,6 +45,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     installManPage wtwitch.1
     installShellCompletion --cmd wtwitch \
       --bash src/wtwitch-completion.bash \
@@ -69,6 +71,8 @@ stdenv.mkDerivation rec {
           ]
         )
       }
+
+    runHook postInstall
   '';
 
   meta = with lib; {

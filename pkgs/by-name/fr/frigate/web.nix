@@ -33,7 +33,11 @@ buildNpmPackage {
   npmDepsHash = "sha256-tPwydUJtFDJs17q0haJaUVEkxua+nHfmwQ9Z9Y24ca8=";
 
   installPhase = ''
+    runHook preInstall
+
     cp -rv dist/ $out
+
+    runHook postInstall
   '';
 
   inherit (frigate) meta;

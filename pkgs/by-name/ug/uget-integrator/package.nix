@@ -25,6 +25,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     for f in conf/com.ugetdm.{chrome,firefox}.json; do
       substituteInPlace $f --replace "/usr" "$out"
     done
@@ -36,6 +38,8 @@ stdenv.mkDerivation rec {
     install -D -t $out/lib/mozilla/native-messaging-hosts    conf/com.ugetdm.firefox.json
 
     wrapPythonPrograms
+
+    runHook postInstall
   '';
 
   meta = with lib; {

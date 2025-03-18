@@ -32,8 +32,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin/
     cp msieve $out/bin/
+
+    runHook postInstall
   '';
 
   meta = {

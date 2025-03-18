@@ -27,6 +27,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/alan/examples
     # Build the release tarball
     make package
@@ -37,6 +39,8 @@ stdenv.mkDerivation rec {
     mv $out/share/alan/{alan,arun} $out/bin
     # a2a3 isn't included in the release tarball
     cp bin/a2a3 $out/bin
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [

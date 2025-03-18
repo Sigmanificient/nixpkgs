@@ -41,6 +41,8 @@ mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/man/man1
 
     install -Dpm755 -D diffpdf $out/bin/diffpdf
@@ -61,6 +63,8 @@ mkDerivation rec {
     Exec=$out/bin/diffpdf
     Terminal=false
     EOF
+
+    runHook postInstall
   '';
 
   meta = {

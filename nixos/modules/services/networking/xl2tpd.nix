@@ -92,6 +92,8 @@ with lib;
           phases = [ "installPhase" ];
           nativeBuildInputs = with pkgs; [ makeWrapper ];
           installPhase = ''
+            runHook preInstall
+
             mkdir -p $out/bin
 
             makeWrapper ${pkgs.ppp}/sbin/pppd $out/bin/pppd \
@@ -101,6 +103,8 @@ with lib;
             makeWrapper ${pkgs.xl2tpd}/bin/xl2tpd $out/bin/xl2tpd \
               --set LD_PRELOAD    "${pkgs.libredirect}/lib/libredirect.so" \
               --set NIX_REDIRECTS "${pkgs.ppp}/sbin/pppd=$out/bin/pppd"
+
+            runHook postInstall
           '';
         };
       in

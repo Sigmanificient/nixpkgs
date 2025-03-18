@@ -17,8 +17,12 @@ buildNpmPackage {
 
   npmInstallFlags = [ "--build-from-source" ];
   installPhase = ''
+    runHook preInstall
+
     cp -r . $out
     ln -s $out/node_modules/.bin $out/bin
+
+    runHook postInstall
   '';
 
   preBuild = ''

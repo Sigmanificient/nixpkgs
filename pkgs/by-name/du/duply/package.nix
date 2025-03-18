@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
   postPatch = "patchShebangs .";
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$out/bin"
     mkdir -p "$out/share/man/man1"
     install -vD duply "$out/bin"
@@ -45,6 +47,8 @@ stdenv.mkDerivation rec {
           which
         ]}
     "$out/bin/duply" txt2man > "$out/share/man/man1/duply.1"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

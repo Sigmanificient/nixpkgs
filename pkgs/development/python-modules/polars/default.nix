@@ -299,7 +299,7 @@ buildPythonPackage rec {
       "tests/unit/io/cloud/test_cloud.py"
     ];
 
-    installPhase = "touch $out";
+    installPhase = "runHook preInstall; touch $out; runHook postInstall";
   };
 
   meta = {

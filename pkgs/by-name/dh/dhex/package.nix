@@ -17,6 +17,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ ncurses ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mkdir -p $out/share/man/man1
     mkdir -p $out/share/man/man5
@@ -26,6 +28,8 @@ stdenv.mkDerivation rec {
     cp dhexrc.5 $out/share/man/man5
     cp dhex_markers.5 $out/share/man/man5
     cp dhex_searchlog.5 $out/share/man/man5
+
+    runHook postInstall
   '';
 
   meta = {

@@ -44,9 +44,13 @@ gnuradio.pkgs.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -D qradiolink $out/bin/qradiolink
     install -Dm644 src/res/icon.png $out/share/pixmaps/qradiolink.png
     install -Dm644 qradiolink.desktop $out/share/applications/qradiolink.desktop
+
+    runHook postInstall
   '';
 
   buildInputs = [

@@ -120,6 +120,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       install -Dm755 gpsbabel -t $out/bin
     ''
     + lib.optionalString withGUI (
@@ -141,6 +143,8 @@ stdenv.mkDerivation rec {
     + lib.optionalString withDoc ''
       install -Dm655 gpsbabel.{html,pdf} -t $doc/share/doc/gpsbabel
       cp -r html $doc/share/doc/gpsbabel
+
+      runHook postInstall
     '';
 
   postFixup = lib.optionalString withGUI (

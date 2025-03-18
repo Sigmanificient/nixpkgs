@@ -29,11 +29,15 @@ stdenv.mkDerivation (finalAttrs: {
       binPath = lib.makeBinPath [ jre ];
     in
     ''
+      runHook preInstall
+
       install -D ${finalAttrs.src_alda} $out/bin/alda
       install -D ${finalAttrs.src_player} $out/bin/alda-player
 
       wrapProgram $out/bin/alda --prefix PATH : $out/bin:${binPath}
       wrapProgram $out/bin/alda-player --prefix PATH : $out/bin:${binPath}
+
+      runHook postInstall
     '';
 
   meta = {

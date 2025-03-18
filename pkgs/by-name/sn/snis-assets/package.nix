@@ -29,6 +29,8 @@ stdenv.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out
     read -r -a store_paths <<< "$srcs"
     mapfile -t out_paths < <(awk '{print $2}' ${manifest})
@@ -37,6 +39,8 @@ stdenv.mkDerivation {
     do
       install -m 444 -D ''${store_paths[$i]} $out/''${out_paths[$i]}
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

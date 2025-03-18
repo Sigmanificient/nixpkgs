@@ -49,7 +49,11 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     dune install --prefix $out --libdir $OCAMLFIND_DESTDIR
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -35,6 +35,8 @@ else
     nativeBuildInputs = [ unzip ];
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out
       cp -r . "$out"
       rm -r $out/Libs
@@ -42,6 +44,8 @@ else
       cp -ur "${maps.minigames}"/* "${maps.melee}"/* "${maps.ladder2017season1}"/* "${maps.ladder2017season2}"/* "${maps.ladder2017season3}"/* \
         "${maps.ladder2017season4}"/* "${maps.ladder2018season1}"/* "${maps.ladder2018season2}"/* \
         "${maps.ladder2018season3}"/*  "${maps.ladder2018season4}"/* "${maps.ladder2019season1}"/* "$out"/Maps/
+
+      runHook postInstall
     '';
 
     preFixup = ''

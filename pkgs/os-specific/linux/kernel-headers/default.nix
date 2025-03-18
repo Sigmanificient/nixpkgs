@@ -121,6 +121,8 @@ let
       # so we replicate it with cp. This also reduces bootstrap closure size.
       installPhase =
         ''
+          runHook preInstall
+
           mkdir -p $out
           cp -r usr/include $out
           find $out -type f ! -name '*.h' -delete
@@ -129,6 +131,8 @@ let
         + ''
           mkdir -p $out/include/config
           echo "${version}-default" > $out/include/config/kernel.release
+
+          runHook postInstall
         '';
 
       meta = with lib; {

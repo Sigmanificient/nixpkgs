@@ -17,8 +17,12 @@ let
     name = "shaka-packager-wrapped";
     phases = [ "installPhase" ];
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/bin
       ln -s ${lib.getExe shaka-packager} $out/bin/shaka-packager
+
+      runHook postInstall
     '';
   };
 in

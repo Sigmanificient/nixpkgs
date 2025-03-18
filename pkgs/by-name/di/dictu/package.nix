@@ -78,6 +78,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out
       cp -r src/include $out/include
       mkdir -p $out/lib
@@ -85,6 +87,8 @@ stdenv.mkDerivation rec {
     ''
     + lib.optionalString cliSupport ''
       install -Dm755 dictu $out/bin/dictu
+
+      runHook postInstall
     '';
 
   meta = with lib; {

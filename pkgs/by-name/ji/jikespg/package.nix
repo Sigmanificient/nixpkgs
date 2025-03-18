@@ -20,7 +20,11 @@ stdenv.mkDerivation rec {
   sourceRoot = "jikespg/src";
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 -t $out/bin jikespg
+
+    runHook postInstall
   '';
 
   meta = with lib; {

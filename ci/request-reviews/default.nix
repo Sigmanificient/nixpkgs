@@ -24,6 +24,8 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [ makeWrapper ];
   dontBuild = true;
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mv dev-branches.txt $out/bin
     for bin in *.sh; do
@@ -40,5 +42,7 @@ stdenvNoCC.mkDerivation {
           ]
         }
     done
+
+    runHook postInstall
   '';
 }

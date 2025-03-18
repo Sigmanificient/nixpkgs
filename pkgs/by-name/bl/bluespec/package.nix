@@ -154,6 +154,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out
       mv inst/bin $out
       mv inst/lib $out
@@ -165,6 +167,8 @@ stdenv.mkDerivation rec {
       mv inst/README $doc/share/doc/bsc
       mv inst/ReleaseNotes.* $doc/share/doc/bsc
       mv inst/doc/*.pdf $doc/share/doc/bsc
+
+      runHook postInstall
     '';
 
   meta = {

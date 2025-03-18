@@ -23,6 +23,8 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp run_scaled $out/bin
     wrapProgram $out/bin/run_scaled --prefix PATH ":" \
@@ -32,6 +34,8 @@ stdenv.mkDerivation {
         xpra
         xrandr
       ]}
+
+    runHook postInstall
   '';
 
   meta = with lib; {

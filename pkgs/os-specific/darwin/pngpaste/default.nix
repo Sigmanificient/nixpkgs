@@ -25,8 +25,12 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp pngpaste $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

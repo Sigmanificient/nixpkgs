@@ -59,9 +59,13 @@ rustPlatform.buildRustPackage rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     cd dist
     mkdir -p $out
     zip -r $out/webadmin.zip *
+
+    runHook postInstall
   '';
 
   passthru = {

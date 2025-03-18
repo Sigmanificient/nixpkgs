@@ -20,8 +20,12 @@ stdenv.mkDerivation rec {
   buildInputs = [ IOKit ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp osx-cpu-temp $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

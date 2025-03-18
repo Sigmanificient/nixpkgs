@@ -15,6 +15,8 @@ stdenvNoCC.mkDerivation {
   };
 
   installPhase = ''
+    runHook preInstall
+
     install -D -pm644 \
       bt/rtkbt/Firmware/BT/rtl8761b_fw \
       $out/lib/firmware/rtl_bt/rtl8761b_fw.bin
@@ -22,6 +24,8 @@ stdenvNoCC.mkDerivation {
     install -D -pm644 \
       bt/rtkbt/Firmware/BT/rtl8761b_config \
       $out/lib/firmware/rtl_bt/rtl8761b_config.bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -44,8 +44,12 @@ stdenv.mkDerivation {
   env.NIX_CFLAGS_COMPILE = "-fcommon";
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out/{bin,share} -p
     cp src/cgg{,-dirgen} $out/bin/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

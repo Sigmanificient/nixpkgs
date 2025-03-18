@@ -138,9 +138,13 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     make install
     installManPage $out/share/man8/*.8
     rm -rf $out/share/man8
+
+    runHook postInstall
   '';
 
   meta = {

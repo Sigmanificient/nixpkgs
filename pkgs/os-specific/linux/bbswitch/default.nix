@@ -45,6 +45,8 @@ stdenv.mkDerivation {
   makeFlags = kernelModuleMakeFlags;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/lib/modules/${kernel.modDirVersion}/misc
     cp bbswitch.ko $out/lib/modules/${kernel.modDirVersion}/misc
 
@@ -60,6 +62,8 @@ stdenv.mkDerivation {
     echo -n ON > /proc/acpi/bbswitch
     EOF
     chmod +x $out/bin/discrete_vga_poweroff $out/bin/discrete_vga_poweron
+
+    runHook postInstall
   '';
 
   meta = with lib; {

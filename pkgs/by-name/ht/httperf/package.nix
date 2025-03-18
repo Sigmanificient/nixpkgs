@@ -28,8 +28,12 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -vp $out/bin
     mv -v src/httperf $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

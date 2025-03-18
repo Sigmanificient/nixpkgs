@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ perl ];
   nativeBuildInputs = [ perl ];
 
-  installPhase = "install -Dm755 srht-gen-oauth-tok $out/bin/srht-gen-oauth-tok";
+  installPhase = "runHook preInstall; install -Dm755 srht-gen-oauth-tok $out/bin/srht-gen-oauth-tok; runHook postInstall";
 
   passthru.tests.sourcehut = nixosTests.sourcehut;
 

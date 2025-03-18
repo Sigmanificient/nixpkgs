@@ -119,8 +119,12 @@ let
     sourceRoot = ".";
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/Applications/
       cp -R 'Synology Drive Client.app' $out/Applications/
+
+      runHook postInstall
     '';
   };
 in

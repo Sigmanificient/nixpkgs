@@ -133,6 +133,8 @@ rec {
       '';
 
       installPhase = ''
+        runHook preInstall
+
         install -Dm755 ./bundles/dynbinary-daemon/dockerd $out/libexec/docker/dockerd
         install -Dm755 ./bundles/dynbinary-daemon/docker-proxy $out/libexec/docker/docker-proxy
 
@@ -153,6 +155,8 @@ rec {
         install -Dm755 ./contrib/dockerd-rootless.sh $out/libexec/docker/dockerd-rootless.sh
         makeWrapper $out/libexec/docker/dockerd-rootless.sh $out/bin/dockerd-rootless \
           --prefix PATH : "$out/libexec/docker:$extraPath:$extraUserPath"
+
+        runHook postInstall
       '';
 
       DOCKER_BUILDTAGS = lib.optional withSystemd "journald"
@@ -224,6 +228,8 @@ rec {
     outputs = ["out"];
 
     installPhase = ''
+      runHook preInstall
+
       install -Dm755 ./build/docker $out/libexec/docker/docker
 
       makeWrapper $out/libexec/docker/docker $out/bin/docker \
@@ -242,6 +248,8 @@ rec {
       installShellCompletion --bash ./contrib/completion/bash/docker
       installShellCompletion --fish ./contrib/completion/fish/docker.fish
       installShellCompletion --zsh  ./contrib/completion/zsh/_docker
+
+      runHook postInstall
     '';
 
     passthru = {

@@ -61,6 +61,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin
       PURS="$out/bin/purs"
 
@@ -70,6 +72,8 @@ stdenv.mkDerivation rec {
     + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
       mkdir -p $out/share/bash-completion/completions
       $PURS --bash-completion-script $PURS > $out/share/bash-completion/completions/purs-completion.bash
+
+      runHook postInstall
     '';
 
   passthru = {

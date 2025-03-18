@@ -34,6 +34,8 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mkdir -p $out/share/man/man1
     install ./unp $out/bin/unp
@@ -44,6 +46,8 @@ stdenv.mkDerivation {
       --prefix PATH : ${lib.makeBinPath runtime_bins}
     wrapProgram $out/bin/ucat \
       --prefix PATH : ${lib.makeBinPath runtime_bins}
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -122,6 +122,8 @@ in
     dontBuild = true;
 
     installPhase = ''
+      runHook preInstall
+
       install -Dt $out/bin ${finalAttrs.gephgui-wry}/bin/gephgui-wry
       install -d $out/share/icons/hicolor
       for i in '16' '32' '64' '128' '256'
@@ -133,6 +135,8 @@ in
       done
       install -Dt $out/share/applications flatpak/icons/io.geph.GephGui.desktop
       sed -i -e '/StartupWMClass/s/=.*/=gephgui-wry/' $out/share/applications/io.geph.GephGui.desktop
+
+      runHook postInstall
     '';
 
     meta = geph-meta // {

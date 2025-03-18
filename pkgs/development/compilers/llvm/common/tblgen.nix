@@ -113,8 +113,12 @@ let
           ];
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out
       cp -ar bin $out/bin
+
+      runHook postInstall
     '';
   });
 in

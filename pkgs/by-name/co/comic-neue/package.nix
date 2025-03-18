@@ -15,6 +15,8 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -pv $out/share/{doc/${pname}-${version},fonts/{opentype,truetype,WOFF,WOFF2}}
     cp -v ${pname}-${version}/{FONTLOG,OFL-FAQ,OFL}.txt $out/share/doc/
     cp -v ${pname}-${version}/Booklet-ComicNeue.pdf $out/share/doc/
@@ -24,6 +26,8 @@ stdenv.mkDerivation rec {
     cp -v ${pname}-${version}/TTF/ComicNeue/*.ttf $out/share/fonts/truetype
     cp -v ${pname}-${version}/WebFonts/*.woff $out/share/fonts/WOFF
     cp -v ${pname}-${version}/WebFonts/*.woff2 $out/share/fonts/WOFF2
+
+    runHook postInstall
   '';
 
   meta = with lib; {

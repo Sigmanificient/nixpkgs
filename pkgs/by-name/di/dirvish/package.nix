@@ -56,6 +56,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp --target-directory=$out/bin $executables
 
@@ -69,6 +71,8 @@ stdenv.mkDerivation rec {
         exit 1
       fi
     done
+
+    runHook postInstall
   '';
 
   postFixup = ''

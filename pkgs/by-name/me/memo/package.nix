@@ -32,6 +32,8 @@ stdenv.mkDerivation rec {
         if pandocSupport then "pandoc_cmd=${pandoc}/bin/pandoc" else "#pandoc_cmd=pandoc";
     in
     ''
+      runHook preInstall
+
       mkdir -p $out/{bin,share/man/man1,share/bash-completion/completions,share/zsh/site-functions}
       substituteInPlace memo \
         --replace "ack_cmd=ack"       "ack_cmd=${silver-searcher}/bin/ag" \
@@ -43,6 +45,8 @@ stdenv.mkDerivation rec {
       mv doc/memo.1 $out/share/man/man1/memo.1
       mv completion/bash/memo.sh $out/share/bash-completion/completions/memo.sh
       mv completion/zsh/_memo    $out/share/zsh/site-functions/_memo
+
+      runHook postInstall
     '';
 
   meta = {

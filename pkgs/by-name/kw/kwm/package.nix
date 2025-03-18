@@ -18,6 +18,8 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp kwmc $out/bin/kwmc
     cp kwm overlaylib.dylib $out
@@ -25,6 +27,8 @@ stdenv.mkDerivation rec {
     mkdir -p $out/Library/LaunchDaemons
     cp ${./org.nixos.kwm.plist} $out/Library/LaunchDaemons/org.nixos.kwm.plist
     substituteInPlace $out/Library/LaunchDaemons/org.nixos.kwm.plist --subst-var out
+
+    runHook postInstall
   '';
 
   meta = with lib; {

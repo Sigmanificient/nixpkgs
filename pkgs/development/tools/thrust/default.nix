@@ -74,6 +74,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ thrustEnv ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mkdir -p $out/libexec/thrust
     unzip -d $out/libexec/thrust/ $src
@@ -82,6 +84,8 @@ stdenv.mkDerivation rec {
     wrapProgram $out/libexec/thrust/thrust_shell \
       --prefix "LD_LIBRARY_PATH" : "${thrustEnv}/lib:${thrustEnv}/lib64"
     ln -s $out/libexec/thrust/thrust_shell $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

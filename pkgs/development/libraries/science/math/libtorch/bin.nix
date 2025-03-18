@@ -43,6 +43,8 @@ stdenv.mkDerivation {
   dontStrip = true;
 
   installPhase = ''
+    runHook preInstall
+
     # Copy headers and CMake files.
     mkdir -p $dev
     cp -r include $dev
@@ -60,6 +62,8 @@ stdenv.mkDerivation {
     substituteInPlace \
       $dev/share/cmake/Caffe2/Caffe2Targets-release.cmake \
       --replace \''${_IMPORT_PREFIX}/lib "$out/lib" \
+
+    runHook postInstall
   '';
 
   postFixup =

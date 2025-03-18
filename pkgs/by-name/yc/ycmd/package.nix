@@ -57,6 +57,8 @@ stdenv.mkDerivation {
   #
   # symlink completion backends where ycmd expects them
   installPhase = ''
+    runHook preInstall
+
     rm -rf ycmd/tests
     find third_party -type d -name "test" -exec rm -rf {} +
 
@@ -91,6 +93,8 @@ stdenv.mkDerivation {
   '' + lib.optionalString withTypescript ''
     TARGET=$out/lib/ycmd/third_party/tsserver
     ln -sf ${typescript} $TARGET
+
+    runHook postInstall
   '';
 
   # fixup the argv[0] and replace __file__ with the corresponding path so

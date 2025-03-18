@@ -21,7 +21,11 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 iotools -t $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

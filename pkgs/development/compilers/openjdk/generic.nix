@@ -492,6 +492,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/lib
 
       mv build/*/images/${if atLeast11 then "jdk" else "j2sdk-image"} $out/lib/openjdk
@@ -572,6 +574,8 @@ stdenv.mkDerivation (finalAttrs: {
     + lib.optionalString (!atLeast11) ''
       ln -s $jre/lib/openjdk/jre/bin $jre/bin
       ln -s $jre/lib/openjdk/jre $out/jre
+
+      runHook postInstall
     '';
 
   preFixup =

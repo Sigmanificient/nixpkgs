@@ -41,6 +41,8 @@ maven.buildMavenPackage rec {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/icons
     mkdir -p $out/share/applications
 
@@ -57,6 +59,8 @@ maven.buildMavenPackage rec {
         ]
       }" \
       --add-flags "-jar $out/share/RuneLite.jar"
+
+    runHook postInstall
   '';
 
   passthru.updateScript = gitUpdater { };

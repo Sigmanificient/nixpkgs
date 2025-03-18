@@ -39,7 +39,11 @@ stdenvNoCC.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 $src/bash-preexec.sh $out/share/bash/bash-preexec.sh
+
+    runHook postInstall
   '';
 
   meta = with lib; {

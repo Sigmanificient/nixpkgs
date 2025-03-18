@@ -20,9 +20,13 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/include $out/lib
     cp lm.h $out/include
     cp liblevmar.a $out/lib
+
+    runHook postInstall
   '';
 
   meta = {

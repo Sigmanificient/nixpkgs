@@ -18,6 +18,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/warsow
     cp -r basewsw $out/share/warsow
     ln -s ${warsow-engine}/lib/warsow $out/share/warsow/libs
@@ -26,6 +28,8 @@ stdenv.mkDerivation rec {
     for i in ${warsow-engine}/bin/*; do
       makeWrapper "$i" "$out/bin/$(basename "$i")" --chdir "$out/share/warsow"
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

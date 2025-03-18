@@ -69,6 +69,8 @@ let
         ];
       in
       ''
+        runHook preInstall
+
         mkdir -p $out/lib/ $out/share/cef/
         cp libcef_dll_wrapper/libcef_dll_wrapper.a $out/lib/
         cp -r ../Resources/* $out/lib/
@@ -81,6 +83,8 @@ let
         cp -r ../include $out
         cp -r ../libcef_dll $out
         cp -r ../cmake $out
+
+        runHook postInstall
       '';
   });
 in

@@ -3847,7 +3847,7 @@ in
           "!package-lock.json"
         ] args.src;
         dontBuild = true;
-        installPhase = "mkdir -p $out; cp -r ./* $out;";
+        installPhase = "runHook preInstall; mkdir -p $out; cp -r ./* $out;; runHook postInstall";
       };
     }
   );

@@ -45,6 +45,8 @@ stdenv.mkDerivation rec {
     ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/libexec/strangeloop/vessel/
     mkdir -p $out/bin
 
@@ -86,6 +88,8 @@ stdenv.mkDerivation rec {
     EOW
 
     chmod +x $out/bin/Vessel
+
+    runHook postInstall
   '';
 
   meta = with lib; {

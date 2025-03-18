@@ -41,6 +41,8 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mkdir -p $out/share/games/lovegames
 
@@ -51,6 +53,8 @@ stdenv.mkDerivation rec {
     chmod +x $out/bin/${pname}
     mkdir -p $out/share/applications
     ln -s ${desktopItem}/share/applications/* $out/share/applications/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

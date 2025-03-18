@@ -32,6 +32,8 @@ mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -D -m0755 build/release/yubikey-personalization-gui "$out/bin/yubikey-personalization-gui"
     install -D -m0644 resources/lin/yubikey-personalization-gui.1 "$out/share/man/man1/yubikey-personalization-gui.1"
 
@@ -49,6 +51,8 @@ mkDerivation rec {
 
       install -D -m0644 yubikey-personalization-gui.png "$out/share/icons/hicolor/''${SIZE}x''${SIZE}/apps/yubikey-personalization-gui.png"
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -28,6 +28,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     sharedir=$out/share/tptp
 
     mkdir -p $sharedir
@@ -46,6 +48,8 @@ stdenv.mkDerivation rec {
     ln -s $sharedir/TPTP2X/tptp2X $out/bin
     ln -s $sharedir/Scripts/tptp2T $out/bin
     ln -s $sharedir/Scripts/tptp4X $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

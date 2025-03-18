@@ -78,6 +78,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ perl ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp inxi $out/bin/
     wrapProgram $out/bin/inxi \
@@ -85,6 +87,8 @@ stdenv.mkDerivation rec {
       ${prefixPath programs}
     mkdir -p $out/share/man/man1
     cp inxi.1 $out/share/man/man1/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

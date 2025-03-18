@@ -58,10 +58,14 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         ${rpm}/bin/rpm2cpio plugins/esci-interpreter-perfection-v330-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out{,/share,/lib}
         cp -r ./usr/share/{iscan-data,esci}/ $out/share/
         cp -r ./usr/lib64/esci $out/lib
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -92,6 +96,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-perfection-v370-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
 
@@ -101,6 +107,8 @@ let
         cp -r usr/lib64/iscan $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -129,6 +137,8 @@ let
         sha256 = "f8b3abf21354fc5b9bc87753cef950b6c0f07bf322a94aaff2c163bafcf50cd9";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-perfection-v550-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -136,6 +146,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
       passthru = {
         registrationCommand = ''
@@ -163,6 +175,8 @@ let
         sha256 = "1vlba7dsgpk35nn3n7is8nwds3yzlk38q43mppjzwsz2d2n7sr33";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-x820-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -170,6 +184,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
       passthru = {
         registrationCommand = ''
@@ -197,6 +213,8 @@ let
         sha256 = "1chxdm6smv2d14pn2jl9xyd0vr42diy7vpskd3b9a61gf5h3gj03";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-x770-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -204,6 +222,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
       passthru = {
         registrationCommand = ''
@@ -229,11 +249,15 @@ let
         sha256 = "1xnbmb2rn610kqpg1x6k1cc13zlmx2f3l2xnj6809rnhg96qqn20";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio esci-interpreter-gt-f720-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
         cp -r usr/share $out
         cp -r usr/lib64 $out/lib
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -264,6 +288,8 @@ let
         sha256 = "00qfdgs03k7bbs67zjrk8hbxvlyinsmk890amp9cmpfjfzdxgg58";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio esci-interpreter-gt-s80-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         ${rpm}/bin/rpm2cpio iscan-plugin-esdip-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
@@ -271,6 +297,8 @@ let
         cp -r usr/share $out
         cp -r usr/lib64 $out/lib
         mkdir $out/share/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -305,6 +333,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-s600-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -312,6 +342,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -342,6 +374,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-s650-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -349,6 +383,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -380,6 +416,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-x750-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -387,6 +425,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -417,6 +457,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-plugin-gt-1500-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
         mkdir $out
@@ -424,6 +466,8 @@ let
         cp -r usr/lib64 $out/lib
         mv $out/share/iscan $out/share/esci
         mv $out/lib/iscan $out/lib/esci
+
+        runHook postInstall
       '';
 
       passthru = {
@@ -452,6 +496,8 @@ let
         sha256 = "0jssigsgkxb9i7qa7db291a1gbvwl795i4ahvb7bnqp33czkj85k";
       };
       installPhase = ''
+        runHook preInstall
+
         cd plugins
         ${rpm}/bin/rpm2cpio iscan-network-nt-*.x86_64.rpm | ${cpio}/bin/cpio -idmv
 
@@ -459,6 +505,8 @@ let
         cp -r usr/share $out
         cp -r usr/lib64 $out/lib
         mkdir $out/share/esci
+
+        runHook postInstall
       '';
       passthru = {
         registrationCommand = "";

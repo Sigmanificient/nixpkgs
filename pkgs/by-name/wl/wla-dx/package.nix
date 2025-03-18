@@ -17,8 +17,12 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     install binaries/* $out/bin
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [ cmake ];

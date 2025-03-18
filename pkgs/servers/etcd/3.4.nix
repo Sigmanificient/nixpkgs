@@ -26,7 +26,11 @@ buildGoModule rec {
   doCheck = false;
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 bin/* bin/functional/cmd/* -t $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -67,7 +67,11 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm555 -t $out/bin ${srcDir}/mprime
+
+    runHook postInstall
   '';
 
   meta = with lib; {

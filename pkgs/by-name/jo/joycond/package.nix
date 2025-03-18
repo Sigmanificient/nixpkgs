@@ -31,6 +31,8 @@ stdenv.mkDerivation {
 
   # CMake has hardcoded install paths
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/{bin,etc/{systemd/system,udev/rules.d},lib/modules-load.d}
 
     cp ./joycond $out/bin
@@ -43,6 +45,8 @@ stdenv.mkDerivation {
 
     substituteInPlace $out/etc/udev/rules.d/89-joycond.rules --replace \
       "/bin/setfacl"  "${acl}/bin/setfacl"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -112,9 +112,13 @@ stdenv.mkDerivation {
   buildPhase = "chmod +x ./buck2 && chmod +x ./rust-project";
   checkPhase = "./buck2 --version && ./rust-project --version";
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     install -D buck2 $out/bin/buck2
     install -D rust-project $out/bin/rust-project
+
+    runHook postInstall
   '';
   postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd buck2 \

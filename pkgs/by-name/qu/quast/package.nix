@@ -36,6 +36,8 @@ pythonPackages.buildPythonApplication rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     substituteInPlace quast_libs/bedtools/Makefile \
       --replace "/bin/bash" "${bash}/bin/bash"
     mkdir -p "$out/${python.sitePackages}"
@@ -43,6 +45,8 @@ pythonPackages.buildPythonApplication rec {
     ${python.pythonOnBuildForHost.interpreter} setup.py install \
       --install-lib=$out/${python.sitePackages} \
       --prefix="$out"
+
+    runHook postInstall
   '';
 
   postFixup = ''

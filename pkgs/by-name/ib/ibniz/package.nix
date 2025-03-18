@@ -17,8 +17,12 @@ stdenv.mkDerivation rec {
   buildInputs = [ SDL ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp ibniz $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

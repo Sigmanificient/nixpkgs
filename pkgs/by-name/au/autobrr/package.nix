@@ -48,7 +48,11 @@ let
     '';
 
     installPhase = ''
+      runHook preInstall
+
       cp -r dist $out
+
+      runHook postInstall
     '';
   };
 in

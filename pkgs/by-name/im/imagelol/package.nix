@@ -42,8 +42,12 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp ./ImageLOL $out/bin
+
+    runHook postInstall
   '';
 
   cmakeFlags =

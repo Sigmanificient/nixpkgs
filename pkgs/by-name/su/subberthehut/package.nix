@@ -26,8 +26,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 subberthehut $out/bin/subberthehut
     install -Dm644 bash_completion $out/share/bash-completion/completions/subberthehut
+
+    runHook postInstall
   '';
 
   meta = with lib; {

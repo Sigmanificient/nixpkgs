@@ -23,12 +23,16 @@ stdenv.mkDerivation (finalAttrs: {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out
       cp -R * $out/
       echo $libPath
     ''
     + lib.optionalString (stdenv.hostPlatform.isLinux) ''
       find $out/bin -executable -type f -exec patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) {} \;
+
+      runHook postInstall
     '';
 
   libPath = lib.makeLibraryPath [ stdenv.cc.cc ];

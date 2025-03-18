@@ -90,8 +90,12 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp omxplayer.bin $out/bin
+
+    runHook postInstall
   '';
 
   buildInputs = [

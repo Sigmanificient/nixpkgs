@@ -112,7 +112,11 @@ let
     '';
 
     installPhase = ''
+      runHook preInstall
+
       mv node_modules $out
+
+      runHook postInstall
     '';
   };
 in

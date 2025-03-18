@@ -42,7 +42,11 @@ buildGoModule rec {
     sourceRoot = "${src.name}/website";
 
     installPhase = ''
+      runHook preInstall
+
       mv build $out
+
+      runHook postInstall
     '';
   };
 

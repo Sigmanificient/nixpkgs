@@ -16,7 +16,11 @@ stdenv.mkDerivation {
   makeFlags = [ "CC=${stdenv.cc.targetPrefix}cc" ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 convfont $out/bin/convfont
+
+    runHook postInstall
   '';
 
   meta = with lib; {

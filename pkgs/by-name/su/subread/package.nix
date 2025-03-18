@@ -26,8 +26,12 @@ stdenv.mkDerivation rec {
   makeFlags = [ "CC_EXEC=cc" ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
     cp -r ../bin $out
+
+    runHook postInstall
   '';
 
   meta = with lib; {

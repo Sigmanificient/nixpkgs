@@ -16,8 +16,12 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp wifi-password.sh $out/bin/wifi-password
+
+    runHook postInstall
   '';
 
   meta = {

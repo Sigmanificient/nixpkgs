@@ -17,10 +17,14 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       install -Dm755 -t $out/bin easypdkprog
     ''
     + lib.optionalString stdenv.hostPlatform.isLinux ''
       install -Dm644 -t $out/etc/udev/rules.d Linux_udevrules/70-stm32vcp.rules
+
+      runHook postInstall
     '';
 
   meta = with lib; {

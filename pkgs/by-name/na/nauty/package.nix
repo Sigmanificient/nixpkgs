@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$out"/{bin,share/doc/nauty} "$dev"/{lib,include/nauty}
 
     find . -type f -perm -111 \! -name '*.*' \! -name configure -exec cp '{}' "$out/bin" \;
@@ -38,6 +40,8 @@ stdenv.mkDerivation rec {
     for i in *.a; do
       cp "$i" "$dev/lib/lib$i";
     done
+
+    runHook postInstall
   '';
 
   checkTarget = "checks";

@@ -39,10 +39,14 @@ stdenvNoCC.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp $src/adl $out/bin
     wrapProgram $out/bin/adl \
       --prefix PATH : ${lib.makeBinPath buildInputs}
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -24,6 +24,8 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/{bin,share/duplicati-${finalAttrs.version}}
     cp -r * $out/share/duplicati-${finalAttrs.version}
     makeWrapper "${lib.getExe mono}" $out/bin/duplicati-cli \
@@ -40,6 +42,8 @@ stdenv.mkDerivation (finalAttrs: {
           sqlite
         ]
       }
+
+    runHook postInstall
   '';
 
   meta = {

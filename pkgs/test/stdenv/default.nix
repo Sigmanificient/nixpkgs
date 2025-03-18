@@ -188,7 +188,11 @@ in
       outputs = ["foo"];
       buildPhase = ":";
       installPhase = ''
+        runHook preInstall
+
         touch $foo
+
+        runHook postInstall
       '';
     });
 

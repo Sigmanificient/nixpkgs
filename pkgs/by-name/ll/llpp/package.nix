@@ -77,6 +77,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       install -d $out/bin
       install build/llpp $out/bin
       install misc/llpp.inotify $out/bin/llpp.inotify
@@ -90,6 +92,8 @@ stdenv.mkDerivation rec {
           --prefix PATH ":" "$out/bin" \
           --prefix PATH ":" "${inotify-tools}/bin" \
           --prefix PATH ":" "${procps}/bin"
+
+      runHook postInstall
     '';
 
   meta = with lib; {

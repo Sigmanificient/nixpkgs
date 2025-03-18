@@ -25,6 +25,8 @@ stdenv.mkDerivation rec {
   buildPhase = null;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp git-recent $out/bin
     wrapProgram $out/bin/git-recent \
@@ -35,6 +37,8 @@ stdenv.mkDerivation rec {
           util-linux
         ]
       }"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

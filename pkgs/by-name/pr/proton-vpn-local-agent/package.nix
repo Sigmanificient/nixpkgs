@@ -22,9 +22,13 @@ rustPlatform.buildRustPackage rec {
   sourceRoot = "${src.name}/python-proton-vpn-local-agent";
 
   installPhase = ''
+    runHook preInstall
+
     # manually install the python binding
     mkdir -p $out/${python3.sitePackages}/proton/vpn/
     cp ./target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/libpython_proton_vpn_local_agent.so $out/${python3.sitePackages}/proton/vpn/local_agent.so
+
+    runHook postInstall
   '';
 
   meta = {

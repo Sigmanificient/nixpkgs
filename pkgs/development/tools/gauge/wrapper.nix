@@ -17,6 +17,8 @@ stdenvNoCC.mkDerivation {
   dontUnpack = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out{bin,/share/gauge/{plugins,config}}
     export NIX_GAUGE_IN_SANDBOX=true
     export GAUGE_HOME=$(mktemp -d)
@@ -43,6 +45,8 @@ stdenvNoCC.mkDerivation {
 
     makeWrapper ${gauge-unwrapped}/bin/gauge $out/bin/gauge \
       --set GAUGE_HOME "$GAUGE_HOME"
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [

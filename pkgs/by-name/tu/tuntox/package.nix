@@ -81,8 +81,12 @@ stdenv.mkDerivation rec {
     '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mv tuntox $out/bin/
+
+    runHook postInstall
   '';
 
   doCheck = false;

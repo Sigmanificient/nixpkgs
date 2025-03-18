@@ -15,6 +15,8 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp -r * $out
     cat > $out/bin/nb << EOF
@@ -22,6 +24,8 @@ stdenv.mkDerivation rec {
     $out/nb "\$@"
     EOF
     chmod 755 $out/bin/nb
+
+    runHook postInstall
   '';
 
   meta = {

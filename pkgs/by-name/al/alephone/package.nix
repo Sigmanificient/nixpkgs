@@ -137,11 +137,15 @@ stdenv.mkDerivation (finalAttrs: {
         dontBuild = true;
 
         installPhase = ''
+          runHook preInstall
+
           mkdir -p $out/bin $out/data/$pname $out/share/applications
           cp -a * $out/data/$pname
           cp $desktopItem/share/applications/* $out/share/applications
           makeWrapper ${finalAttrs.finalPackage}/bin/alephone $out/bin/$pname \
             --add-flags $out/data/$pname
+
+          runHook postInstall
         '';
       }
       // extraArgs

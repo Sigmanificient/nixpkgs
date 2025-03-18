@@ -84,6 +84,8 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$prefix/usr/lib/thunderbird-bin-${version}"
     cp -r * "$prefix/usr/lib/thunderbird-bin-${version}"
 
@@ -98,6 +100,8 @@ stdenv.mkDerivation {
     # See: https://github.com/mozilla/policy-templates/blob/master/README.md
     mkdir -p "$out/lib/thunderbird-bin-${version}/distribution";
     ln -s ${policiesJson} "$out/lib/thunderbird-bin-${version}/distribution/policies.json";
+
+    runHook postInstall
   '';
 
   passthru.updateScript = import ./../../browsers/firefox-bin/update.nix {

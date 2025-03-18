@@ -27,8 +27,12 @@ mkYarnPackage rec {
   packageJSON = ./package.json;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp -r * $out
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [ makeWrapper ];

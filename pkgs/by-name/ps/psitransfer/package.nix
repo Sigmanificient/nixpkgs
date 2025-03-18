@@ -28,7 +28,11 @@ let
     '';
 
     installPhase = ''
+      runHook preInstall
+
       cp -r ../public/app $out
+
+      runHook postInstall
     '';
   };
 in

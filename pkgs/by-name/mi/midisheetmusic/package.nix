@@ -52,6 +52,8 @@ stdenv.mkDerivation {
   doCheck = false;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/applications $out/share/pixmaps $out/bin
 
     cp deb/midisheetmusic.desktop $out/share/applications
@@ -67,6 +69,8 @@ stdenv.mkDerivation {
       } \
       --prefix PATH : ${lib.makeBinPath [ timidity ]} \
       --add-flags $out/bin/.MidiSheetMusic.exe
+
+    runHook postInstall
   '';
 
   meta = with lib; {

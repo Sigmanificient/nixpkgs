@@ -30,6 +30,8 @@ stdenv.mkDerivation {
 
   dontConfigure = true;
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$out"
 
     # shipped Qt is buggy
@@ -67,6 +69,8 @@ stdenv.mkDerivation {
       patchelf --set-rpath "$libPath:$out/lib" \
         "$out/lib/$l"
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

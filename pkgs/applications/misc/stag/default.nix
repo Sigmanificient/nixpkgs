@@ -33,7 +33,11 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [ curses ];
 
   installPhase = ''
+    runHook preInstall
+
     make install PREFIX=$out
+
+    runHook postInstall
   '';
 
   meta = with lib; {

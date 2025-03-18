@@ -25,6 +25,8 @@ stdenv.mkDerivation {
   buildInputs = [ gawk ];
 
   installPhase = ''
+    runHook preInstall
+
     # FIXME: Storing config files under `$out/etc' is not very useful.
 
     substituteInPlace "hibernate.sh" --replace \
@@ -39,6 +41,8 @@ stdenv.mkDerivation {
     PREFIX="$out" CONFIG_PREFIX="$out" ./install.sh
 
     ln -s "$out/share/hibernate/scriptlets.d" "$out/etc/hibernate"
+
+    runHook postInstall
   '';
 
   meta = {

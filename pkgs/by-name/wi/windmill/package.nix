@@ -202,8 +202,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
     ];
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/share
       mv build $out/share/windmill-frontend
+
+      runHook postInstall
     '';
   };
 

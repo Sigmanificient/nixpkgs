@@ -87,8 +87,12 @@ let
       };
 
       installPhase = ''
+        runHook preInstall
+
         mkdir -p $out/include/tmd
         cp TriangleMeshDistance/include/tmd/TriangleMeshDistance.h $out/include/tmd/
+
+        runHook postInstall
       '';
     };
 

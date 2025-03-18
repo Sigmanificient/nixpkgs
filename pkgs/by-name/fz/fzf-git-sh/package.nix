@@ -52,7 +52,11 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -D fzf-git.sh $out/share/${pname}/fzf-git.sh
+
+    runHook postInstall
   '';
 
   meta = with lib; {

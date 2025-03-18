@@ -26,8 +26,12 @@ let
       ({ name, ... }: {
         name = "${name}-unsecvars";
         installPhase = ''
+          runHook preInstall
+
           mkdir $out
           cp sysdeps/generic/unsecvars.h $out
+
+          runHook postInstall
         '';
       });
   };

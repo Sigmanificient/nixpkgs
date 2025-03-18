@@ -54,8 +54,12 @@ stdenv.mkDerivation rec {
     );
 
   installPhase = ''
+    runHook preInstall
+
     install -D -t "$out/bin" blahtex blahtexml
     install -m644 -D -t "$doc/share/doc/blahtexml" Documentation/manual.pdf
+
+    runHook postInstall
   '';
 
   meta = with lib; {

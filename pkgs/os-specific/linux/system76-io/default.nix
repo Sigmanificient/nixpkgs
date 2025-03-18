@@ -29,7 +29,11 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -D system76-io.ko $out/lib/modules/${kernel.modDirVersion}/misc/system76-io.ko
+
+    runHook postInstall
   '';
 
   meta = {

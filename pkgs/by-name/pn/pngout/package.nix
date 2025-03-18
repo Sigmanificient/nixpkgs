@@ -61,11 +61,15 @@ stdenv.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin
       cp ${platform.folder}/pngout $out/bin
     ''
     + lib.optionalString stdenv.hostPlatform.isLinux ''
       patchelf --set-interpreter ${stdenv.cc.libc}/lib/${platform.ld-linux} $out/bin/pngout
+
+      runHook postInstall
     '';
 
   meta = {

@@ -34,8 +34,12 @@ stdenv.mkDerivation {
 
   doCheck = true;
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/yosys/plugins
     cp ghdl.so $out/share/yosys/plugins/ghdl.so
+
+    runHook postInstall
   '';
 
   meta = with lib; {

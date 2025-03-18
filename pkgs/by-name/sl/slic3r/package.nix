@@ -108,6 +108,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p "$out/share/slic3r/"
     cp -r * "$out/share/slic3r/"
     wrapProgram "$out/share/slic3r/slic3r.pl" \
@@ -118,6 +120,8 @@ stdenv.mkDerivation rec {
     ln -s "$out/share/slic3r/var/Slic3r.png" "$out/share/pixmaps/slic3r.png"
     mkdir -p "$out/share/applications"
     cp "$desktopItem"/share/applications/* "$out/share/applications/"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

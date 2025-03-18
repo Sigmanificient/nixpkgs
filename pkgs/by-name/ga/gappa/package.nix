@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = "./remake";
-  installPhase = "./remake install";
+  installPhase = "runHook preInstall; ./remake install; runHook postInstall";
 
   meta = {
     homepage = "http://gappa.gforge.inria.fr/";

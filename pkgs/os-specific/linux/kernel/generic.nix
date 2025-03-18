@@ -188,7 +188,7 @@ let
         perl -w $generateConfig
     '';
 
-    installPhase = "mv $buildRoot/.config $out";
+    installPhase = "runHook preInstall; mv $buildRoot/.config $out; runHook postInstall";
 
     enableParallelBuilding = true;
 

@@ -85,6 +85,8 @@ let
       ];
 
       installPhase = ''
+        runHook preInstall
+
         install -vd "$out/bin" "$out/lib/haxe/std"
         cp -vr haxe haxelib std "$out/lib/haxe"
 
@@ -113,6 +115,8 @@ let
         EOF
         chmod +x $out/bin/$name
         done
+
+        runHook postInstall
       '';
 
       setupHook = ./setup-hook.sh;

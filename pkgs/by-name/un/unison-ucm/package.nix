@@ -48,6 +48,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/{bin,lib}
     mv runtime $out/lib/runtime
     mv ui $out/ui
@@ -62,6 +64,8 @@ stdenv.mkDerivation (finalAttrs: {
       --prefix PATH ":" "${lib.makeBinPath [ less ]}" \
       --add-flags "--runtime-path $out/lib/runtime/bin/unison-runtime" \
       --set UCM_WEB_UI "$out/ui"
+
+    runHook postInstall
   '';
 
   meta = with lib; {

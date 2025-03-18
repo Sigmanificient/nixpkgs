@@ -57,6 +57,8 @@ let
       nativeBuildInputs = [ makeWrapper ];
 
       installPhase = ''
+        runHook preInstall
+
         makeWrapper ${jdk}/bin/java $out/bin/charles \
           --add-flags "-Xmx1024M -Dcharles.config='~/.charles.config' -jar $out/share/java/charles.jar"
 
@@ -69,6 +71,8 @@ let
 
         mkdir -p $out/share/icons
         cp -r icon $out/share/icons/hicolor
+
+        runHook postInstall
       '';
 
       meta = with lib; {

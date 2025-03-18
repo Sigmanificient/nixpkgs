@@ -105,8 +105,12 @@ let
         src = codecs_src;
 
         installPhase = ''
+          runHook preInstall
+
           mkdir $out
           cp -prv * $out
+
+          runHook postInstall
         '';
 
         meta.license = lib.licenses.unfree;

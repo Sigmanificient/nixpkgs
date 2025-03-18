@@ -15,8 +15,12 @@ stdenv.mkDerivation {
 
   makeFlags = [ "PREFIX=\${out}" ];
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp noip2 $out/bin
+
+    runHook postInstall
   '';
 
   enableParallelBuilding = true;

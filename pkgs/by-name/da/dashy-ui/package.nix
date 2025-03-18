@@ -40,8 +40,12 @@ stdenv.mkDerivation (finalAttrs: {
     yarn validate-config --offline
   '';
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
     cp -R dist/* $out
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [

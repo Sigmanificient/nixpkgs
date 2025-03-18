@@ -33,6 +33,8 @@
   }
 ";
     installPhase = ''
+        runHook preInstall
+
         mkdir -p $out/share/dictd
       cd $out/share/dictd
       echo "${databases}" >databases.names
@@ -75,7 +77,9 @@
         echo "  index_suffix $out/share/dictd/$base.suffix" >> dictd.conf
         echo "}" >> dictd.conf
       done
-    '';
+
+        runHook postInstall
+      '';
 
   in
 

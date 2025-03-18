@@ -27,7 +27,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm0444 -t $out/ memtest.bin memtest.efi
+
+    runHook postInstall
   '';
 
   meta = {

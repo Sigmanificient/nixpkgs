@@ -109,7 +109,7 @@ lib.makeOverridable (
       } // attrs.meta or { };
     }
     // lib.optionalAttrs (attrs.headersOnly or false) {
-      installPhase = "includesPhase";
+      installPhase = "runHook preInstall; includesPhase; runHook postInstall";
       dontBuild = true;
     }
     // (builtins.removeAttrs attrs [ "env" ])

@@ -21,7 +21,11 @@ buildGoModule rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install out/docker-machine-driver-hyperkit -Dt $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

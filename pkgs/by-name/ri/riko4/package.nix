@@ -62,6 +62,8 @@ stdenv.mkDerivation rec {
 
   # Riko4 needs the data/ and scripts/ directories to be in its PWD.
   installPhase = ''
+    runHook preInstall
+
     install -Dm0755 riko4 $out/bin/.riko4-unwrapped
     mkdir -p $out/lib/riko4
     cp -r ../data $out/lib/riko4
@@ -73,6 +75,8 @@ stdenv.mkDerivation rec {
     popd > /dev/null
     EOF
     chmod +x $out/bin/riko4
+
+    runHook postInstall
   '';
 
   meta = with lib; {

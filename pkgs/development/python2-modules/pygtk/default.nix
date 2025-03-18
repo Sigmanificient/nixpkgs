@@ -61,7 +61,7 @@ buildPythonPackage rec {
     + lib.optionalString (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) " -lpython2.7"
     + " -fpermissive"; # downgrade code errors to warnings
 
-  installPhase = "installPhase";
+  installPhase = "runHook preInstall; installPhase; runHook postInstall";
 
   checkPhase =
     ''

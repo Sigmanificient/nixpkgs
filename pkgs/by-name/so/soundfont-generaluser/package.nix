@@ -16,7 +16,11 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm644 GeneralUser*.sf2 $out/share/soundfonts/GeneralUser-GS.sf2
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -23,7 +23,11 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     touch $out
+
+    runHook postInstall
   '';
 
   env.HOME = "$TMPDIR";

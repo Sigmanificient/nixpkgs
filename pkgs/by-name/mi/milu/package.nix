@@ -26,8 +26,12 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp bin/milu $out/bin
+
+    runHook postInstall
   '';
 
   nativeBuildInputs = [

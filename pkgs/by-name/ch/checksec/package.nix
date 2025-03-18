@@ -74,6 +74,8 @@ stdenv.mkDerivation rec {
       ];
     in
     ''
+      runHook preInstall
+
       mkdir -p $out/bin
       install checksec $out/bin
       substituteInPlace $out/bin/checksec \
@@ -82,6 +84,8 @@ stdenv.mkDerivation rec {
         --replace "/lib/libc.so.6" "${glibc}/lib/libc.so.6"
       wrapProgram $out/bin/checksec \
         --prefix PATH : ${path}
+
+      runHook postInstall
     '';
 
   passthru.tests = {

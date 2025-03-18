@@ -154,8 +154,12 @@ let
       stdenv.mkDerivation {
         name = "mattermost-plugin";
         installPhase = ''
+          runHook preInstall
+
           mkdir -p $out/share
           cp ${plugin} $out/share/plugin.tar.gz
+
+          runHook postInstall
         '';
         dontUnpack = true;
         dontPatch = true;
@@ -175,6 +179,8 @@ let
         nativeBuildInputs = [ autoPatchelfHook ] ++ mattermostPluginDerivations;
         buildInputs = [ cfg.package ];
         installPhase = ''
+          runHook preInstall
+
           mkdir -p $out
           plugins=(${
             escapeShellArgs (map (plugin: "${plugin}/share/plugin.tar.gz") mattermostPluginDerivations)
@@ -187,6 +193,8 @@ let
             GZIP_OPT=-9 tar -C "$hash" -cvzf "$out/$hash.tar.gz" .
             rm -rf "$hash"
           done
+
+          runHook postInstall
         '';
 
         dontUnpack = true;

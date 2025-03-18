@@ -39,6 +39,8 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm0755 nix-serve.psgi $out/libexec/nix-serve/nix-serve.psgi
 
     makeWrapper ${
@@ -56,6 +58,8 @@ stdenv.mkDerivation {
                   ]
                 }" \
                 --add-flags $out/libexec/nix-serve/nix-serve.psgi
+
+    runHook postInstall
   '';
 
   /**

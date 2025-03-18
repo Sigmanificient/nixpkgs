@@ -28,8 +28,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 mtprotoproxy.py $out/bin/mtprotoproxy
     wrapPythonPrograms
+
+    runHook postInstall
   '';
 
   meta = with lib; {

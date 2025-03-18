@@ -27,8 +27,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     mv jack_oscrolloscope $out/bin/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

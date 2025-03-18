@@ -41,8 +41,12 @@ buildPythonApplication rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     install -D networkd-notify -t "$out/bin/"
     install -D -m0644 networkd-notify.desktop -t "$out/share/applications/"
+
+    runHook postInstall
   '';
 
   # Let the Python wrapper add gappsWrapperArgs, to avoid two layers of wrapping.

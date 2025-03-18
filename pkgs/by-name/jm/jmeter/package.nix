@@ -21,6 +21,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
 
     rm bin/*.bat bin/*.cmd
@@ -40,6 +42,8 @@ stdenv.mkDerivation rec {
 
     wrapProgram $out/bin/jmeter --set JAVA_HOME "${jre}"
     wrapProgram $out/bin/jmeter.sh --set JAVA_HOME "${jre}"
+
+    runHook postInstall
   '';
 
   doInstallCheck = false; # NoClassDefFoundError: org/apache/logging/log4j/Level for tests

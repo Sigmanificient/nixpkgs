@@ -71,9 +71,13 @@ stdenv.mkDerivation (finalAttrs: {
     npmDepsHash = "sha256-IpqineYa15GBqoPDJ7RpaDsq+MQIIDcdq7yhwmH4Lzo=";
 
     installPhase = ''
+      runHook preInstall
+
       rm -rf node_modules
       mkdir $out
       cp -r * $out
+
+      runHook postInstall
     '';
   };
 

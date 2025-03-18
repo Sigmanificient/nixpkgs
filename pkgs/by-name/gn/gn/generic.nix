@@ -77,7 +77,11 @@ stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -vD out/gn "$out/bin/gn"
+
+    runHook postInstall
   '';
 
   setupHook = ./setup-hook.sh;

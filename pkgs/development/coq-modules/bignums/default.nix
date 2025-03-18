@@ -72,7 +72,11 @@
         echo building nothing
       '';
       installPhase = ''
+        runHook preInstall
+
         echo installing nothing
+
+        runHook postInstall
       '';
       propagatedBuildInputs = o.propagatedBuildInputs
         ++ [ rocqPackages.bignums ];

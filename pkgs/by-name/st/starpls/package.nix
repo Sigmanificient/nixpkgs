@@ -33,7 +33,11 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -D $src $out/bin/starpls
+
+    runHook postInstall
   '';
 
   passthru = {

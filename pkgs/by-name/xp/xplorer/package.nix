@@ -44,7 +44,11 @@ let
     ];
     yarnBuildScript = "prebuild";
     installPhase = ''
+      runHook preInstall
+
       cp -r out $out
+
+      runHook postInstall
     '';
   });
 in

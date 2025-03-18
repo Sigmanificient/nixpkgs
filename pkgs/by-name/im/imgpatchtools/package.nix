@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
     zlib
   ];
 
-  installPhase = "install -Dt $out/bin bin/*";
+  installPhase = "runHook preInstall; install -Dt $out/bin bin/*; runHook postInstall";
 
   meta = with lib; {
     description = "Tools to manipulate Android OTA archives";

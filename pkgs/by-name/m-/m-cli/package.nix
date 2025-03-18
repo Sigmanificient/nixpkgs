@@ -18,6 +18,8 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     local MPATH="$out/share/m"
 
     gawk -i inplace '{
@@ -34,6 +36,8 @@ stdenv.mkDerivation rec {
     install -Dt "$out/share/bash-completion/completions/" -m444 completion/bash/m
     install -Dt "$out/share/fish/vendor_completions.d/" -m444 completion/fish/m.fish
     install -Dt "$out/share/zsh/site-functions/" -m444 completion/zsh/_m
+
+    runHook postInstall
   '';
 
   meta = with lib; {

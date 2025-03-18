@@ -75,6 +75,8 @@ let
       '';
 
       installPhase = ''
+        runHook preInstall
+
         # work around timestamp issues
         # https://github.com/NixOS/nixpkgs/issues/270#issuecomment-467583872
         export SOURCE_DATE_EPOCH=315532800
@@ -84,6 +86,8 @@ let
         # point directly to the wheel file.
         ./bazel-bin/pip_pkg . --release
         mv *.whl "$out"
+
+        runHook postInstall
       '';
     };
   };

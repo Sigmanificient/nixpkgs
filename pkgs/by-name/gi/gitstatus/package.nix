@@ -39,6 +39,8 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 usrbin/gitstatusd $out/bin/gitstatusd
     install -Dm444 gitstatus.plugin.sh -t $out/share/gitstatus/
     install -Dm444 gitstatus.plugin.zsh -t $out/share/gitstatus/
@@ -59,6 +61,8 @@ stdenv.mkDerivation rec {
     echo $out/share/gitstatus
     EOF
     chmod +x $out/bin/gitstatus-share
+
+    runHook postInstall
   '';
 
   # Don't install the "install" and "build.info" files, which the end user

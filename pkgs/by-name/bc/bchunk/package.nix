@@ -19,8 +19,12 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dt $out/bin bchunk
     install -Dt $out/share/man/man1 bchunk.1
+
+    runHook postInstall
   '';
 
   meta = with lib; {

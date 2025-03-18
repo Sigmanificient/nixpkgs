@@ -16,7 +16,11 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   installPhase = ''
+    runHook preInstall
+
     install -D 41-nitrokey.rules -t $out/etc/udev/rules.d
+
+    runHook postInstall
   '';
 
   meta = with lib; {

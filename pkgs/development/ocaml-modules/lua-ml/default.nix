@@ -36,7 +36,11 @@ else
     buildFlags = [ "lib" ];
 
     installPhase = ''
+      runHook preInstall
+
       opaline -prefix $out -libdir $OCAMLFIND_DESTDIR
+
+      runHook postInstall
     '';
 
     meta = {

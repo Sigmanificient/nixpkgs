@@ -20,8 +20,12 @@ stdenv.mkDerivation {
   nativeBuildInputs = with python3Packages; [ wrapPython ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 yaml-merge.py $out/bin/yaml-merge
     wrapPythonPrograms
+
+    runHook postInstall
   '';
 
   meta = with lib; {

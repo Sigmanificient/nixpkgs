@@ -12,7 +12,7 @@ let
     src = ./cargo-vendor-normalise.py;
     nativeBuildInputs = [ python3.pkgs.wrapPython ];
     dontUnpack = true;
-    installPhase = "install -D $src $out/bin/cargo-vendor-normalise";
+    installPhase = "runHook preInstall; install -D $src $out/bin/cargo-vendor-normalise; runHook postInstall";
     pythonPath = [ python3.pkgs.toml ];
     postFixup = "wrapPythonPrograms";
     doInstallCheck = true;
@@ -156,9 +156,13 @@ lib.warn
 
         # Build a reproducible tar, per instructions at https://reproducible-builds.org/docs/archives/
         installPhase = ''
+          runHook preInstall
+
           tar --owner=0 --group=0 --numeric-owner --format=gnu \
               --sort=name --mtime="@$SOURCE_DATE_EPOCH" \
               -czf $out $name
+
+          runHook postInstall
         '';
 
         inherit (hash_) outputHashAlgo outputHash;

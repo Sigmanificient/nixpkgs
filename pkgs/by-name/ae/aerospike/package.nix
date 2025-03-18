@@ -41,8 +41,12 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp target/Linux-x86_64/bin/asd $out/bin/asd
+
+    runHook postInstall
   '';
 
   meta = with lib; {

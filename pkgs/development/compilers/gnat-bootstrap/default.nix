@@ -130,6 +130,8 @@ in {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out
     cp -ar * $out/
   ''
@@ -172,6 +174,8 @@ in {
 
     "$out"/libexec/gcc/${upstreamTriplet}/${gccVersion}/install-tools/mkheaders -v -v \
       "$out" "${stdenv.cc.libc}"
+
+    runHook postInstall
   '';
 
   passthru = {

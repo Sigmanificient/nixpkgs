@@ -19,6 +19,8 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/bash-completion/completions
     cp gibo $out/bin
     cp gibo-completion.bash $out/share/bash-completion/completions
@@ -28,6 +30,8 @@ stdenv.mkDerivation rec {
         -i "$out/bin/gibo"
     sed -e 's|\<find |${findutils}/bin/find |g' \
         -i "$out/share/bash-completion/completions/gibo-completion.bash"
+
+    runHook postInstall
   '';
 
   meta = {

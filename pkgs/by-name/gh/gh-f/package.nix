@@ -39,7 +39,11 @@ stdenvNoCC.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -D -m755 "gh-f" "$out/bin/gh-f"
+
+    runHook postInstall
   '';
 
   postFixup = ''

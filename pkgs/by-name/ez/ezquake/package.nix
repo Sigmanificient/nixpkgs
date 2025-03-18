@@ -53,9 +53,13 @@ stdenv.mkDerivation rec {
       arch = lib.head (lib.splitString "-" stdenv.hostPlatform.system);
     in
     ''
+      runHook preInstall
+
       mkdir -p $out/bin
       find .
       mv ezquake-${sys}-${arch} $out/bin/ezquake
+
+      runHook postInstall
     '';
 
   enableParallelBuilding = true;

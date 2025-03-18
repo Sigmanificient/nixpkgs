@@ -80,6 +80,8 @@ stdenv.mkDerivation rec {
       DEFAULT_PAGER=
   '';
   installPhase = ''
+    runHook preInstall
+
     export DESTDIR=/
     shorewall-core-${version}/install.sh
 
@@ -105,6 +107,8 @@ stdenv.mkDerivation rec {
     # will generate the config files.
     sed -i $out/share/shorewall/shorewallrc \
         -e 's~^CONFDIR=.*~CONFDIR=/etc~'
+
+    runHook postInstall
   '';
 
   meta = {

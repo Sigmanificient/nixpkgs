@@ -22,10 +22,14 @@ stdenv.mkDerivation {
   env.NIX_CFLAGS_COMPILE = "-fcommon";
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/alan2
     cp compiler/alan $out/bin/alan2
     cp interpreter/arun $out/bin/arun2
     cp alan.readme ChangeLog $out/share/alan2
+
+    runHook postInstall
   '';
 
   meta = with lib; {

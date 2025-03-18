@@ -50,6 +50,8 @@ stdenv.mkDerivation {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
 
     CP="cp -r --no-preserve=mode"
@@ -68,6 +70,8 @@ stdenv.mkDerivation {
     installShellCompletion --bash .completion/bash/fstar.exe.bash
     installShellCompletion --fish .completion/fish/fstar.exe.fish
     installShellCompletion --zsh --name _fstar.exe .completion/zsh/__fstar.exe
+
+    runHook postInstall
   '';
 
   passthru.updateScript = writeScript "update-fstar" ''

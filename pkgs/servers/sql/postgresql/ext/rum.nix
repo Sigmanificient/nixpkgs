@@ -45,7 +45,7 @@ buildPostgresqlExtension (finalAttrs: {
 
       runHook postCheck
     '';
-    installPhase = "touch $out";
+    installPhase = "runHook preInstall; touch $out; runHook postInstall";
   };
 
   meta = with lib; {

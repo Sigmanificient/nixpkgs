@@ -64,9 +64,13 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 titanion $out/bin/titanion
     mkdir -p $out/share/games/titanion
     cp -r sounds images $out/share/games/titanion/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

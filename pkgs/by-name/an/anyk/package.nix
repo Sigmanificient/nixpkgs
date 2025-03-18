@@ -117,6 +117,8 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir $out
     cp -r application $out/opt
 
@@ -133,6 +135,8 @@ stdenv.mkDerivation {
 
     ln -s $out/opt/abevjava.png $out/share/pixmaps/anyk.png
     ln -s $out/opt/abevjava.png $out/share/icons/anyk.png
+
+    runHook postInstall
   '';
 
   meta = with lib; {

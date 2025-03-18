@@ -30,12 +30,16 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     runHook preBuild
 
     install -Dm555 dhcpdump "$out/bin/dhcpdump"
     installManPage dhcpdump.8
 
     runHook postBuild
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -15,12 +15,16 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   dontUnpack = true;
 
   installPhase = ''
+    runHook preInstall
+
     runHook preBuild
 
     gzip -c -d "$src" > dbip-city-lite.mmdb
     install -Dm444 dbip-city-lite.mmdb "$out/share/dbip/dbip-city-lite.mmdb"
 
     runHook postBuild
+
+    runHook postInstall
   '';
 
   passthru.mmdb = "${finalAttrs.finalPackage}/share/dbip/dbip-city-lite.mmdb";

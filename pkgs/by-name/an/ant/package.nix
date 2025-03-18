@@ -24,6 +24,8 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/ant
     mv * $out/share/ant/
 
@@ -82,6 +84,8 @@ stdenv.mkDerivation (finalAttrs: {
     EOF
 
     chmod +x $out/bin/ant
+
+    runHook postInstall
   '';
 
   passthru = {

@@ -24,10 +24,14 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp minimap2 $out/bin
     mkdir -p $out/share/man/man1
     cp minimap2.1 $out/share/man/man1
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -328,8 +328,12 @@ in
         ;
         dontBuilt = true;
         installPhase = ''
+          runHook preInstall
+
           cp -R ext/fast_mmaped_file_rs $out
           cp Cargo.lock $out
+
+          runHook postInstall
         '';
       };
       hash = "sha256-KVbmDAa9EFwTUTHPF/8ZzycbieMhAuiidiz5rqGIKOo=";

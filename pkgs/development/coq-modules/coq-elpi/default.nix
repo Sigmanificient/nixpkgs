@@ -142,7 +142,11 @@ patched-derivation4 = patched-derivation3.overrideAttrs
         echo building nothing
       '';
       installPhase = ''
+        runHook preInstall
+
         echo installing nothing
+
+        runHook postInstall
       '';
       propagatedBuildInputs = o.propagatedBuildInputs
         ++ [ rocqPackages.rocq-elpi ];
@@ -155,9 +159,13 @@ patched-derivation4 = patched-derivation3.overrideAttrs
         dune build -p rocq-elpi @install ''${enableParallelBuilding:+-j $NIX_BUILD_CORES}
       '';
       installPhase = ''
+        runHook preInstall
+
         dune install --root . rocq-elpi --prefix=$out --libdir $OCAMLFIND_DESTDIR
         mkdir $out/lib/coq/
         mv $OCAMLFIND_DESTDIR/coq $out/lib/coq/${coq.coq-version}
+
+        runHook postInstall
       '';
     }
   );

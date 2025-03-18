@@ -34,6 +34,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     cp -a . $out/
     mkdir $out/bin
     mv $out/documentation /$out/doc
@@ -50,6 +52,8 @@ stdenv.mkDerivation rec {
         ]
       }" \
       --set JAVA_HOME "${jre8}"
+
+    runHook postInstall
   '';
 
   meta = {

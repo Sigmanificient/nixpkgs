@@ -38,6 +38,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -pv $out/share/netlogo $out/share/icons/hicolor/256x256/apps $out/share/applications $out/share/doc
     cp -rv app $out/share/netlogo
     cp -v readme.md $out/share/doc/
@@ -49,6 +51,8 @@ stdenv.mkDerivation rec {
 
     cp $src1 $out/share/icons/hicolor/256x256/apps/netlogo.png
     cp ${desktopItem}/share/applications/* $out/share/applications
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -45,6 +45,8 @@ let
         ++ lib.optional RSupport finalAttrs.R;
 
       installPhase = ''
+        runHook preInstall
+
         mkdir -p "$out/opt"
         mv * $out/
         for n in $(find $out/bin -type f -executable ! -name "find-spark-home"); do
@@ -57,6 +59,8 @@ let
         done
         ln -s ${finalAttrs.hadoop} "$out/opt/hadoop"
         ${lib.optionalString RSupport ''ln -s ${finalAttrs.R} "$out/opt/R"''}
+
+        runHook postInstall
       '';
 
       passthru = {

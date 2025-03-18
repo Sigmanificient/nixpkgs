@@ -23,7 +23,11 @@ let
     npmDepsHash = "sha256-NCq8RuaC+dO6Zbgl1ucJxhJrVZ69Va3b2/gYn4fThAw=";
     sourceRoot = "${src.name}/ui";
     installPhase = ''
+      runHook preInstall
+
       cp -pr --reflink=auto -- dist "$out/"
+
+      runHook postInstall
     '';
   };
 in

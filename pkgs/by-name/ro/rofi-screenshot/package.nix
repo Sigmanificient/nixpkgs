@@ -45,7 +45,11 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 ${pname} $out/bin/${pname}
+
+    runHook postInstall
   '';
 
   meta = {

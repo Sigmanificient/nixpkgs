@@ -34,6 +34,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
 
     cp wt $out/bin
@@ -47,6 +49,8 @@ stdenv.mkDerivation (finalAttrs: {
     installShellCompletion --zsh completions/_wt_completion
     installShellCompletion --bash completions/wt_completion
     installShellCompletion --fish completions/wt.fish
+
+    runHook postInstall
   '';
 
   meta = {

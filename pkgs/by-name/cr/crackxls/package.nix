@@ -48,8 +48,12 @@ stdenv.mkDerivation rec {
   makeFlags = [ "OPTIM_FLAGS=" ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp crackxls2003 $out/bin/
+
+    runHook postInstall
   '';
 
   meta = with lib; {

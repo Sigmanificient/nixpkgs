@@ -62,6 +62,8 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out
     cp -R usr/* $out/
     ln -sf ${luajit_lua52}/bin/luajit $out/lib/koreader/luajit
@@ -77,6 +79,8 @@ stdenv.mkDerivation rec {
         stdenv.cc.cc
       ]
     }
+
+    runHook postInstall
   '';
 
   passthru = {

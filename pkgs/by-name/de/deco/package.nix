@@ -19,9 +19,13 @@ stdenv.mkDerivation {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp deco $out/bin
     chmod +x $out/bin/deco
+
+    runHook postInstall
   '';
 
   postFixup = ''

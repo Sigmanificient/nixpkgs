@@ -116,12 +116,16 @@ stdenv.mkDerivation rec {
     cd ..
   '';
   installPhase = ''
+    runHook preInstall
+
     approot="$(dirname $(dirname $(find -path '*/appinfo/info.xml' | head -n 1)))"
     if [ -d "$approot" ];
     then
       mv "$approot/" $out
       chmod -R a-w $out
     fi
+
+    runHook postInstall
   '';
 
   meta = with lib; {

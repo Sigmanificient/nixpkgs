@@ -102,6 +102,8 @@ in stdenv.mkDerivation {
   '';
 
   installPhase = ''
+    runHook preInstall
+
     install -d $out/share/playonlinux
     cp -r . $out/share/playonlinux/
 
@@ -129,6 +131,8 @@ in stdenv.mkDerivation {
     for f in $out/share/playonlinux/bin/*; do
       bzip2 $f
     done
+
+    runHook postInstall
   '';
 
   dontWrapGApps = true;

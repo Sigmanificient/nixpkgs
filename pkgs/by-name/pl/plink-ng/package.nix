@@ -44,8 +44,12 @@ stdenv.mkDerivation rec {
   makefile = "Makefile.std";
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     cp plink $out/bin
+
+    runHook postInstall
   '';
 
   meta = {

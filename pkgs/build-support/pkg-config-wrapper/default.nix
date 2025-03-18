@@ -63,6 +63,8 @@ stdenv.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin $out/nix-support
 
       wrap() {
@@ -85,6 +87,8 @@ stdenv.mkDerivation {
     # at this.)
     + ''
       ln -s ${pkg-config}/share $out/share
+
+      runHook postInstall
     '';
 
   setupHooks = [

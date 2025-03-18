@@ -38,6 +38,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p "$out"
       cp -vr . "$out"
       # Remove (for now) uneeded Windows .bat files
@@ -48,6 +50,8 @@ stdenv.mkDerivation rec {
     + lib.optionalString (jdk != null) ''
       # Inject JDK path into grails
       sed -i -e '2iJAVA_HOME=${jdk.home}' "$out"/bin/grails
+
+      runHook postInstall
     '';
 
   preferLocalBuild = true;

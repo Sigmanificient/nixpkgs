@@ -111,7 +111,11 @@ let
     '';
 
     installPhase = ''
+      runHook preInstall
+
       cp -rva . $out
+
+      runHook postInstall
     '';
   };
 

@@ -12,6 +12,8 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
   dontStrip = true;
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin $out/share/flyway
     cp -r drivers conf licenses README.txt $out/share/flyway
     install -Dt $out/share/flyway/lib lib/*.jar lib/flyway/*.jar lib/oracle_wallet/*.jar lib/aad/msal4j-1.15.1.jar lib/aad/slf4j-api-1.7.30.jar
@@ -19,6 +21,8 @@ stdenv.mkDerivation (finalAttrs: {
       --add-flags "-Djava.security.egd=file:/dev/../dev/urandom" \
       --add-flags "-classpath '$out/share/flyway/lib/*:$out/share/flyway/drivers/*'" \
       --add-flags "org.flywaydb.commandline.Main" \
+
+    runHook postInstall
   '';
   passthru.tests = {
     version = testers.testVersion { package = finalAttrs.finalPackage; };

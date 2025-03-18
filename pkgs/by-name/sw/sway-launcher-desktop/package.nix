@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
 
   installPhase = ''
+    runHook preInstall
+
     install -d $out/bin
     install ${pname}.sh $out/bin/${pname}
     wrapProgram $out/bin/${pname} \
@@ -38,6 +40,8 @@ stdenv.mkDerivation rec {
           fzf
         ]
       }
+
+    runHook postInstall
   '';
 
   meta = with lib; {

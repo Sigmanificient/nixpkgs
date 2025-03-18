@@ -35,8 +35,12 @@ lib.throwIf (lib.versionAtLeast ocaml.version "5.0")
     buildPhase = "ocamlbuild src/ocamlify.native";
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/bin
       mv _build/src/ocamlify.native $out/bin/ocamlify
+
+      runHook postInstall
     '';
 
     dontStrip = true;

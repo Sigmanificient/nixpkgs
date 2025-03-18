@@ -466,7 +466,7 @@ let
                         psql -a -v ON_ERROR_STOP=1 -f "$sqlPath"
                         runHook postCheck
                       '';
-                      installPhase = "touch $out";
+                      installPhase = "runHook preInstall; touch $out; runHook postInstall";
                     }
                     // extraArgs
                   );

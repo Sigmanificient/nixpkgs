@@ -87,6 +87,8 @@ stdenv.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p "$prefix/lib/firefox-bin-${version}"
       cp -r * "$prefix/lib/firefox-bin-${version}"
 
@@ -96,6 +98,8 @@ stdenv.mkDerivation {
       # See: https://github.com/mozilla/policy-templates/blob/master/README.md
       mkdir -p "$out/lib/firefox-bin-${version}/distribution";
       ln -s ${policiesJson} "$out/lib/firefox-bin-${version}/distribution/policies.json";
+
+      runHook postInstall
     '';
 
   passthru = {

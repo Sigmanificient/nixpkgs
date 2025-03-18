@@ -15,8 +15,12 @@ stdenv.mkDerivation {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     install loadwatch lw-ctl $out/bin
+
+    runHook postInstall
   '';
 
   meta = with lib; {

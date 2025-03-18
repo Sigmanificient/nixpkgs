@@ -23,9 +23,13 @@ import ./versions.nix (
     '';
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/share/zabbix/
       cp -a ${if lib.versionAtLeast version "5.0.0" then "ui/." else "frontends/php/."} $out/share/zabbix/
       cp ${phpConfig} $out/share/zabbix/conf/zabbix.conf.php
+
+      runHook postInstall
     '';
 
     meta = {

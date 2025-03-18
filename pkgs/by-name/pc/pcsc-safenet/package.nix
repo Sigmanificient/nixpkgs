@@ -44,6 +44,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mv usr/* .
 
     mkdir -p pcsc/drivers
@@ -74,6 +76,8 @@ stdenv.mkDerivation rec {
     ) || exit
 
     ln -sf ${lib.getLib openssl}/lib/libcrypto.so $out/lib/libcrypto.so.3
+
+    runHook postInstall
   '';
 
   dontAutoPatchelf = true;

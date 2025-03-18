@@ -15,6 +15,8 @@ stdenv.mkDerivation rec {
   };
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out
     cp -prvd bin $out/
 
@@ -24,6 +26,8 @@ stdenv.mkDerivation rec {
 
     mkdir -p $out/lib
     cp -prvd lib/* $out/lib/
+
+    runHook postInstall
   ''; # */
 
   meta = {

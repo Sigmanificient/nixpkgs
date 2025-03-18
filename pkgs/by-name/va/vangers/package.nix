@@ -38,10 +38,14 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ cmake ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin
     install -T -m755 server/vangers_server $out/bin/vangers_server
     install -T -m755 src/vangers $out/bin/vangers
     install -T -m755 surmap/surmap $out/bin/surmap
+
+    runHook postInstall
   '';
 
   meta = {

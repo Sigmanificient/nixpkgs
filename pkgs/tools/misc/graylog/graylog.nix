@@ -38,6 +38,8 @@ stdenv.mkDerivation rec {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out
       cp -r {graylog.jar,bin,plugin} $out
     ''
@@ -46,6 +48,8 @@ stdenv.mkDerivation rec {
     ''
     + ''
       wrapProgram $out/bin/graylogctl $makeWrapperArgs
+
+      runHook postInstall
     '';
 
   meta = with lib; {

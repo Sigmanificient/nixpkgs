@@ -81,6 +81,8 @@ rec {
         doCheck = false;
 
         installPhase = ''
+          runHook preInstall
+
           dropinDir="$out/eclipse/dropins/${name}"
 
           # Install features.
@@ -112,6 +114,8 @@ rec {
             fi
           done
           cd ..
+
+          runHook postInstall
         '';
       }
     );

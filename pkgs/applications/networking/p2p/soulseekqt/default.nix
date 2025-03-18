@@ -38,6 +38,8 @@ mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     binary="$(realpath ${appextracted}/AppRun)"
     install -Dm755 $binary -t $out/bin
 
@@ -54,6 +56,8 @@ mkDerivation rec {
       mkdir -p $out/share/icons/hicolor/"$size"x"$size"/apps
       convert -resize "$size"x"$size" $icon $out/share/icons/hicolor/"$size"x"$size"/apps/$(basename $icon)
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {

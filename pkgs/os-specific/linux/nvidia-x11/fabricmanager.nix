@@ -32,6 +32,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/{bin,share/nvidia-fabricmanager}
     for bin in nv{-fabricmanager,switch-audit};do
       ${patchelf}/bin/patchelf \
@@ -56,6 +58,8 @@ stdenv.mkDerivation rec {
     for b in $out/bin/*;do
       ${ldd} $b | grep -vqz "not found"
     done
+
+    runHook postInstall
   '';
 
   meta = {

@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ jre ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -pv $out/{share,bin}
     cp -Rv * $out/share/
 
@@ -39,6 +41,8 @@ stdenv.mkDerivation rec {
       --set JAVA  "${jre}/bin/java"
 
     chmod +x $out/bin/cytoscape
+
+    runHook postInstall
   '';
 
   meta = {

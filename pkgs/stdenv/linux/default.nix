@@ -543,12 +543,16 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
             strictDeps = true;
             # We wouldn't need to *copy* all, but it's easier and the result is temporary anyway.
             installPhase = ''
+              runHook preInstall
+
               mkdir -p "$out"/bin
               cp -a '${prevStage.bintools.bintools}'/bin/* "$out"/bin/
               chmod +w "$out"/bin/ld.bfd
               patchelf --set-interpreter '${getLibc self}'/lib/ld*.so.? \
                 --set-rpath "${getLibc self}/lib:$(patchelf --print-rpath "$out"/bin/ld.bfd)" \
                 "$out"/bin/ld.bfd
+
+              runHook postInstall
             '';
           };
         };

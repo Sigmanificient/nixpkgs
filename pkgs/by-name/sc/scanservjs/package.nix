@@ -52,7 +52,11 @@ let
 
     dontNpmInstall = true;
     installPhase = ''
+      runHook preInstall
+
       mv /build/source/dist/client $out
+
+      runHook postInstall
     '';
   };
 

@@ -32,6 +32,8 @@ stdenv.mkDerivation {
 
   installPhase =
     ''
+      runHook preInstall
+
       mkdir -p $out/bin
       for d in bin/sqitch etc lib share ; do
         # make sure dest alreay exists before symlink
@@ -43,6 +45,8 @@ stdenv.mkDerivation {
     ''
     + lib.optionalString stdenv.hostPlatform.isDarwin ''
       shortenPerlShebang $out/bin/sqitch
+
+      runHook postInstall
     '';
   dontStrip = true;
   postFixup = ''

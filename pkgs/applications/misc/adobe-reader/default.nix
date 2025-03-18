@@ -40,6 +40,8 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     p=$out/libexec/adobe-reader
     mkdir -p $out/libexec
     tar xvf COMMON.TAR -C $out
@@ -52,6 +54,8 @@ stdenv.mkDerivation rec {
 
     # Remove unneeded files
     rm $p/bin/UNINSTALL
+
+    runHook postInstall
   '';
 
   postFixup = ''

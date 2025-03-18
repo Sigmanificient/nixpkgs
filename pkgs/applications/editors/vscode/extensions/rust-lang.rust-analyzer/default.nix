@@ -54,6 +54,8 @@ let
 
     # Follows https://github.com/rust-lang/rust-analyzer/blob/41949748a6123fd6061eb984a47f4fe780525e63/xtask/src/dist.rs#L39-L65
     installPhase = ''
+      runHook preInstall
+
       jq '
         .version = $ENV.version |
         .releaseTag = $ENV.releaseTag |
@@ -63,6 +65,8 @@ let
 
       mkdir -p $out
       npx vsce package -o $out/${pname}.zip
+
+      runHook postInstall
     '';
   };
 

@@ -54,8 +54,12 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/lib/lv2
     cp -r src/tunefish4/Builds/LinuxMakefile/build/Tunefish4.lv2 $out/lib/lv2
+
+    runHook postInstall
   '';
 
   enableParallelBuilding = true;

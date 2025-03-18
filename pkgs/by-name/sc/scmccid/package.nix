@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ patchelf ];
 
   installPhase = ''
+    runHook preInstall
+
     RPATH=${libusb-compat-0_1.out}/lib:${stdenv.cc.libc.out}/lib
 
     for a in proprietary/*/Contents/Linux/*.so*; do
@@ -39,6 +41,8 @@ stdenv.mkDerivation rec {
 
     mkdir -p $out/pcsc/drivers
     cp -R proprietary/* $out/pcsc/drivers
+
+    runHook postInstall
   '';
 
   meta = {

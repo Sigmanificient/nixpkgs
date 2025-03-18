@@ -57,7 +57,7 @@ let
       dontUnpack = false;
 
       dontInstall = false;
-      installPhase = "cp -pr --reflink=auto -- . $out";
+      installPhase = "runHook preInstall; cp -pr --reflink=auto -- . $out; runHook postInstall";
     }
   );
 in

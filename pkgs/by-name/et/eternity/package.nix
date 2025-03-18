@@ -33,10 +33,14 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
+    runHook preInstall
+
     install -Dm755 eternity/eternity $out/lib/eternity/eternity
     cp -r $src/base $out/lib/eternity/base
     mkdir $out/bin
     makeWrapper $out/lib/eternity/eternity $out/bin/eternity
+
+    runHook postInstall
   '';
 
   meta = {

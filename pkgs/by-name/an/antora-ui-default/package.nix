@@ -47,8 +47,12 @@ stdenvNoCC.mkDerivation {
   #
   # [1]: https://github.com/NixOS/nixpkgs/blob/8885a1e21ad43f8031c738a08029cd1d4dcbc2f7/pkgs/stdenv/generic/setup.sh#L792-L795
   installPhase = ''
+    runHook preInstall
+
     mkdir --parents "$out"
     cp "$src/ui-bundle.zip" "$out"
+
+    runHook postInstall
   '';
 
   meta = {
