@@ -536,7 +536,9 @@ assert bootstrapTools.passthru.isFromBootstrapFiles or false; # sanity check
           bintools = self.stdenvNoCC.mkDerivation {
             pname = prevStage.bintools.bintools.pname + "-patchelfed-ld";
             inherit (prevStage.bintools.bintools) version;
-            passthru = { inherit (prevStage.bintools.passthru) isFromBootstrapFiles; };
+            passthru = {
+# inherit (prevStage.bintools.passthru) isFromBootstrapFiles;
+            };
             enableParallelBuilding = true;
             dontUnpack = true;
             dontBuild = true;

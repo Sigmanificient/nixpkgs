@@ -78,10 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "leocad";
     homepage = "https://www.leocad.org/";
     license = lib.licenses.gpl2Only;
-    maintainers = with lib.maintainers; [
-      peterhoeg
-      hetraeus
-    ];
+    maintainers = with lib.maintainers; [ peterhoeg ];
     platforms = lib.platforms.linux;
   };
 })
