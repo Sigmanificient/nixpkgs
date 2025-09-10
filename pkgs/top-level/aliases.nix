@@ -2569,6 +2569,7 @@ mapAliases {
   xen_4_18 = throw "Due to technical challenges involving building older versions of Xen with newer dependencies, the Xen Project Hypervisor Maintenance Team decided to switch to a latest-only support cycle. As Xen 4.18 would have been the 'n-1' version, it was removed"; # Added 2024-10-05
   xen_4_19 = throw "Use 'xen' instead"; # Added 2024-10-05
   xenPackages = throw "The attributes in the xenPackages set have been promoted to the top-level. (xenPackages.xen_4_19 -> xen)";
+  xf86-input-cmt = throw "'xf86-input-cmt' has been removed as it was unmaintained and broken"; # Added 2025-09-11
   xflux-gui = throw "'xflux-gui' has been removed as it was unmaintained"; # Added 2025-08-22
   xflux = throw "'xflux' has been removed as it was unmaintained"; # Added 2025-08-22
   xineLib = throw "'xineLib' has been renamed to/replaced by 'xine-lib'"; # Converted to throw 2024-10-17
