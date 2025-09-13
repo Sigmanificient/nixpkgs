@@ -1,0 +1,14 @@
+diff --git a/include/ma_global.h b/include/ma_global.h
+index 3cd3857b..fb7918f3 100644
+--- a/include/ma_global.h
++++ b/include/ma_global.h
+@@ -688,7 +688,9 @@ typedef int		myf;	/* Type of MyFlags in my_funcs */
+ typedef char		my_bool; /* Small bool */
+ typedef unsigned long long my_ulonglong;
+ #if !defined(bool) && !defined(bool_defined) && (!defined(HAVE_BOOL) || !defined(__cplusplus))
++  #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+ typedef char		bool;	/* Ordinary boolean values 0 1 */
++  #endif
+ #endif
+ 	/* Macros for converting *constants* to the right type */
+ #define INT8(v)		(int8) (v)

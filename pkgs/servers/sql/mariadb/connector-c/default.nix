@@ -10,6 +10,7 @@
   libiconv,
   version,
   hash,
+  patches ? [],
   ...
 }:
 
@@ -41,6 +42,8 @@ stdenv.mkDerivation {
     "-DWITH_EXTERNAL_ZLIB=ON"
     "-DWITH_MYSQLCOMPAT=ON"
   ];
+
+  inherit patches;
 
   postPatch = ''
     substituteInPlace mariadb_config/mariadb_config.c.in \
