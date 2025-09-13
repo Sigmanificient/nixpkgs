@@ -33,6 +33,8 @@ stdenv.mkDerivation {
     "dev"
   ];
 
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=format-extra-args";
+
   cmakeFlags = [
     "-DMARIADB_UNIX_ADDR=/run/mysqld/mysqld.sock"
     "-DWITH_CURL=ON"

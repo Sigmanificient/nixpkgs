@@ -3,7 +3,7 @@
 callPackage ./. (
   args
   // {
-    version = "3.1.21";
-    hash = "sha256-guN3Rcsb/EV4rxPE3yhJRSsT1+z44zUetg7ZBA4WjIc=";
+    version = "3.1.29";
+    hash = "sha256-a3lFQdH28iaLV5fEqBoDFVq88vlG+rCKYaiDOjEkGR8=";
   }
 )
