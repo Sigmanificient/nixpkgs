@@ -15,7 +15,7 @@
   nix-update-script,
 }:
 buildPythonPackage rec {
-  name = "bezier";
+  pname = "bezier";
   version = "2024.6.20";
   src = fetchFromGitHub {
     owner = "dhermes";
@@ -40,10 +40,10 @@ buildPythonPackage rec {
   env = {
     BEZIER_IGNORE_VERSION_CHECK = 1;
     BEZIER_INSTALL_PREFIX = stdenv.mkDerivation {
-      name = "bezier-fortran-extension";
+      pname = "bezier-fortran-extension";
       inherit version src;
 
-      sourceRoot = "${src.name}/src/fortran";
+      sourceRoot = "bezier/src/fortran";
 
       nativeBuildInputs = [
         cmake
