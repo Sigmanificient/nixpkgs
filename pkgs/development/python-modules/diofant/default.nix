@@ -29,14 +29,6 @@ buildPythonPackage rec {
     hash = "sha256-uQvAYSURDhuAKcX0WVMk4y2ZXiiq0lPZct/7A5n5t34=";
   };
 
-  patches = [
-    (fetchpatch {
-      name = "remove-pip-from-build-dependencies.patch";
-      url = "https://github.com/diofant/diofant/commit/117e441808faa7c785ccb81bf211772d60ebdec3.patch";
-      hash = "sha256-MYk1Ku4F3hAv7+jJQLWhXd8qyKRX+QYuBzPfYWT0VbU=";
-    })
-  ];
-
   build-system = [ setuptools-scm ];
 
   dependencies = [ mpmath ];
