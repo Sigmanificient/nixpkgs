@@ -162,9 +162,12 @@ let
 
     // {
 
-      meta = {
+      meta = let
+        pos = builtins.unsafeGetAttrPos "pname" stdenv;
+      in {
         description = "The default build environment for Unix packages in Nixpkgs";
         platforms = lib.platforms.all;
+        position = "${pos.file}:${toString pos.line}";
       };
 
       inherit buildPlatform hostPlatform targetPlatform;
