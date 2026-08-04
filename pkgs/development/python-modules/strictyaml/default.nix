@@ -4,12 +4,13 @@
   fetchPypi,
   ruamel-yaml,
   python-dateutil,
+  setuptools,
 }:
 
 buildPythonPackage rec {
   pname = "strictyaml";
   version = "1.7.3";
-  format = "setuptools";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
@@ -21,7 +22,9 @@ buildPythonPackage rec {
       --replace "ruamel.yaml==0.17.4" "ruamel.yaml"
   '';
 
-  propagatedBuildInputs = [
+  build-system = [ setuptools ];
+
+  dependencies = [
     ruamel-yaml
     python-dateutil
   ];
